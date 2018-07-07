@@ -1,0 +1,3 @@
+[submodule "MigraDoc"]
+	path = MigraDoc
+	url = https://github.com/LokiMidgard/MigraDoc.git
