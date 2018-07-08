@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="XMLSchema1"
+    targetNamespace="http://tempuri.org/PDFGenerator"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/PDFGenerator"
+    xmlns:mstns="http://tempuri.org/PDFGenerator"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="Project">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Template" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+              <xs:element name="Image" type="mstns:ImageElement" />
+              <xs:element name="Text" type="mstns:TextElement" />
+            </xs:choice>
+            <xs:attribute name="Context" type="xs:string"/>
+            <xs:attribute name="Width" type="mstns:Unit"/>
+            <xs:attribute name="Height" type="mstns:Unit"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!--<xs:attributeGroup name="VisibleGroup">
+    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="IsVisiblePath" type="xs:string"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="WordStyleGroup">
+    <xs:attributeGroup ref="mstns:VisibleGroup" />
+    <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
+    <xs:attribute name="EmSize" type="xs:double"/>
+    <xs:attribute name="FontName" type="xs:string"/>
+
+    <xs:attribute name="FontStylePath" type="xs:string"/>
+    <xs:attribute name="EmSizePath" type="xs:string"/>
+    <xs:attribute name="FontNamePath" type="xs:string"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="ParagraphStyleGroup">
+    <xs:attributeGroup ref="mstns:WordStyleGroup" />
+
+    <xs:attribute name="Linespacing" default="1" type="xs:double"/>
+    <xs:attribute name="BeforeParagraph" type="mstns:Unit"/>
+    <xs:attribute name="AfterParagraph" type="mstns:Unit"/>
+
+    <xs:attribute name="LinespacingPath" default="1" type="xs:string"/>
+    <xs:attribute name="BeforeParagraphPath" type="xs:string"/>
+    <xs:attribute name="AfterParagraphPath" type="xs:string"/>
+
+  </xs:attributeGroup>-->
+
+  <!--<xs:attributeGroup name="PositionGroup">
+    <xs:attribute name="left" type="mstns:Unit"/>
+    <xs:attribute name="top" type="mstns:Unit"/>
+    <xs:attribute name="width" type="mstns:Unit"/>
+    <xs:attribute name="height" type="mstns:Unit"/>
+  </xs:attributeGroup>-->
+
+  <xs:simpleType name="FontStyle">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Regular" />
+      <xs:enumeration value="Bold" />
+      <xs:enumeration value="Italic" />
+      <xs:enumeration value="BoldItalic" />
+      <xs:enumeration value="Underline" />
+      <xs:enumeration value="Strikeout" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Alignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Near" />
+      <xs:enumeration value="Center" />
+      <xs:enumeration value="Far" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="Unit">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+(\.[0-9]+)? ?(pt|mm|cm|in|pu)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--<xs:attributeGroup name="baseElementGroup">
+    <xs:attributeGroup ref="VisibleGroup"/>
+    <xs:attributeGroup ref="PositionGroup"/>
+  </xs:attributeGroup>-->
+
+  <!--<xs:complexType name="imageElement">
+    <xs:attribute name="Path" type="xs:string"/>
+    <xs:attributeGroup ref="mstns:baseElementGroup"/>
+  </xs:complexType>-->
+
+  <!--<xs:complexType name="textElement">
+    <xs:sequence>
+      <xs:element name="Paragraph" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="LineBreak">
+              <xs:complexType>
+                <xs:attributeGroup ref="mstns:WordStyleGroup"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="Run">
+              <xs:complexType >
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attributeGroup ref="mstns:WordStyleGroup"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+          <xs:attributeGroup ref="mstns:ParagraphStyleGroup"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="mstns:baseElementGroup"/>
+  </xs:complexType>-->
+
+
+  <xs:complexType name="BaseElement" abstract="true">
+
+    <xs:attribute name="left" type="mstns:Unit"/>
+    <xs:attribute name="top" type="mstns:Unit"/>
+    <xs:attribute name="width" type="mstns:Unit"/>
+    <xs:attribute name="height" type="mstns:Unit"/>
+
+    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="IsVisiblePath" type="xs:string"/>
+
+    <xs:attribute name="ZPosition" type="xs:double"/>
+
+
+  </xs:complexType>
+  
+  <xs:complexType name="TextElement">
+    <xs:complexContent>
+      <xs:extension base="BaseElement">
+        <xs:sequence>
+          <xs:element name="Paragraph" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:choice maxOccurs="unbounded">
+                <xs:element name="LineBreak" type="LineBreak"/>
+                <xs:element name="Run" type="TextRun" />
+              </xs:choice>
+
+
+              <xs:attribute name="IsVisible" type="xs:boolean"/>
+              <xs:attribute name="IsVisiblePath" type="xs:string"/>
+
+              <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
+              <xs:attribute name="EmSize" type="xs:double"/>
+              <xs:attribute name="FontName" type="xs:string"/>
+
+              <xs:attribute name="Linespacing" default="1" type="xs:double"/>
+              <xs:attribute name="BeforeParagraph" type="mstns:Unit"/>
+              <xs:attribute name="AfterParagraph" type="mstns:Unit"/>
+              <xs:attribute name="Alignment" type="mstns:Alignment"/>
+
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="LineBreak">
+    <xs:complexContent>
+      <xs:extension base="Run">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TextRun">
+    <xs:complexContent>
+      <xs:extension base="Run">
+        <xs:choice>
+          <xs:element  name="Text" type="xs:string"/>
+          <xs:element  name="TextPath" type="xs:string"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Run" abstract="true">
+    
+      <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
+      <xs:attribute name="EmSize" type="xs:double"/>
+      <xs:attribute name="FontName" type="xs:string"/>
+
+    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="IsVisiblePath" type="xs:string"/>
+    
+  </xs:complexType>
+
+  <xs:complexType name="ImageElement">
+    <xs:complexContent>
+      <xs:extension base="BaseElement">
+        <xs:attribute name="ImageLocationPath" type="xs:string"/>
+        <xs:attribute name="ImageLocation" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  
+</xs:schema>

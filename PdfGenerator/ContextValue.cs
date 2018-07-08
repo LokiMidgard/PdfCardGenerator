@@ -16,6 +16,7 @@ namespace PdfGenerator
         private readonly T value;
         private readonly bool hasConcretValue;
         private readonly string xpath;
+        internal bool IsXPath => !this.hasConcretValue;
 
         private ContextValue(T value, bool hasConcretValue, string xpath)
         {
@@ -119,5 +120,8 @@ namespace PdfGenerator
         {
             this.Path = path;
         }
+
+        public static implicit operator XPath(string value) => new XPath(value);
+
     }
 }

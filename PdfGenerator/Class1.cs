@@ -27,9 +27,10 @@ namespace PdfGenerator
             var template = new PageTemplate()
             {
                 Height = new XUnit(88, XGraphicsUnit.Millimeter),
-                Width = new XUnit(60, XGraphicsUnit.Millimeter)
+                Width = new XUnit(60, XGraphicsUnit.Millimeter),
+                ContextPath = "//Elements/Element"
             };
-            var header = new ParaGraph()
+            var header = new Paragraph()
             {
                 EmSize = 20,
                 FontStyle = XFontStyle.Bold,
@@ -37,7 +38,7 @@ namespace PdfGenerator
                 AfterParagraph = new XUnit(4, XGraphicsUnit.Millimeter)
             };
             header.AddRun(new XPath("@Header"));
-            var body = new ParaGraph()
+            var body = new Paragraph()
             {
                 FontStyle = XFontStyle.Italic
             };
@@ -61,8 +62,8 @@ namespace PdfGenerator
 
             template.Elements.Add(textelement);
 
-            
-            var document = template.GetDocuments(doc.XPathSelectElements("//Elements/Element"));
+
+            var document = template.GetDocuments(doc);
             document.Info.Title = "Created with PDFsharp";
 
             //// Create an empty page

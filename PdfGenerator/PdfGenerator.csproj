@@ -9,4 +9,13 @@
     <ProjectReference Include="..\MigraDoc\MigraDoc\src\MigraDoc.RtfRendering\MigraDoc.RtfRendering.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="XMLImport.additions.cs">
+      <DependentUpon>XMLImport.cs</DependentUpon>
+    </Compile>
+    <Compile Update="XMLImport.cs">
+      <DependentUpon>XMLImport.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

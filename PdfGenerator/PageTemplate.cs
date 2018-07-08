@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace PdfGenerator
 {
@@ -13,9 +14,15 @@ namespace PdfGenerator
         public XUnit Width { get; set; }
         public XUnit Height { get; set; }
 
-        public ICollection<Element> Elements { get; } = new List<Element>();
+        public XPath ContextPath { get; set; }
 
-        public PdfDocument GetDocuments(IEnumerable<XElement> elements)
+        public IList<Element> Elements { get; set; } = new List<Element>();
+
+        public PdfDocument GetDocuments(XDocument document)
+        {
+            return GetDocuments(document.XPathSelectElements(this.ContextPath.Path));
+        }
+        private PdfDocument GetDocuments(IEnumerable<XElement> elements)
         {
             var document = new PdfDocument
             {

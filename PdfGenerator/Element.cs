@@ -24,11 +24,11 @@ namespace PdfGenerator
 
     public class TextElement : Element
     {
-        public IEnumerable<ParaGraph> Paragraphs { get; set; }
+        public IList<Paragraph> Paragraphs { get; set; }
 
     }
 
-    public class ParaGraph
+    public class Paragraph
     {
         public IReadOnlyList<Run> Runs { get; }
 
@@ -47,7 +47,7 @@ namespace PdfGenerator
         public ContextValue<bool> IsVisible { get; set; } = true;
         public ContextValue<XLineAlignment> Alignment { get; set; }
 
-        public ParaGraph()
+        public Paragraph()
         {
             this.runs = new List<Run>();
             this.Runs = this.runs.AsReadOnly();
@@ -69,6 +69,20 @@ namespace PdfGenerator
             return newRun;
         }
 
+        public LineBreakRun AddLineBreak(ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null) => this.InsertLineBreak(this.runs.Count, fontStyle, emSize, fontName, isVisible);
+        public LineBreakRun InsertLineBreak(int index, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null)
+        {
+            var newRun = new LineBreakRun(this)
+            {
+                EmSize = emSize,
+                FontName = fontName,
+                FontStyle = fontStyle,
+                IsVisible = isVisible ?? true
+            };
+            this.runs.Insert(index, newRun);
+            return newRun;
+        }
+
     }
 
     public abstract class Run
@@ -82,9 +96,9 @@ namespace PdfGenerator
         public ContextValue<string>? FontName { get => this._fontName ?? this.Paragraph.FontName; set => this._fontName = value; }
 
         public ContextValue<bool> IsVisible { get; set; } = true;
-        public ParaGraph Paragraph { get; }
+        public Paragraph Paragraph { get; }
 
-        internal Run(ParaGraph paragraph)
+        internal Run(Paragraph paragraph)
         {
             this.Paragraph = paragraph;
         }
@@ -92,13 +106,13 @@ namespace PdfGenerator
     }
     public sealed class LineBreakRun : Run
     {
-        internal LineBreakRun(ParaGraph paragraph) : base(paragraph)
+        internal LineBreakRun(Paragraph paragraph) : base(paragraph)
         {
         }
     }
     public sealed class TextRun : Run
     {
-        internal TextRun(ParaGraph paragraph) : base(paragraph)
+        internal TextRun(Paragraph paragraph) : base(paragraph)
         {
         }
 
@@ -108,6 +122,6 @@ namespace PdfGenerator
 
     public class ImageElement : Element
     {
-
+        public ContextValue<string> ImagePath { get; set; }
     }
 }
