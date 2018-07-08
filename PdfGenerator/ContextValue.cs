@@ -50,10 +50,8 @@ namespace PdfGenerator
                     result = d != 0;
                 else if (element is string s)
                     result = s != "";
-                else if (element is IEnumerable<XElement> xelements)
-                    result = xelements.Any();
-                else if (element is IEnumerable<XAttribute> xattributes)
-                    result = xattributes.Any();
+                else if (element is System.Collections.IEnumerable objects)
+                    result = objects.OfType<object>().Any();
                 else throw new NotSupportedException($"The type {element.GetType()}");
 
                 return (T)(object)result;
@@ -64,10 +62,20 @@ namespace PdfGenerator
 
                 if (element is null)
                     result = "";
-                else if (element is IEnumerable<XElement> xelements)
-                    result = xelements.FirstOrDefault()?.Value ?? "";
-                else if (element is IEnumerable<XAttribute> xattributes)
-                    result = xattributes.FirstOrDefault()?.Value ?? "";
+                else if (element is string s) // string implements IEnumberable, so we don't want just to get the first character
+                    result = s;
+                else if (element is System.Collections.IEnumerable objects)
+                {
+                    var firstValue = objects.OfType<object>().FirstOrDefault();
+                    if (firstValue == null)
+                        result = "";
+                    else if (firstValue is XElement xElement)
+                        result = xElement.Value;
+                    else if (firstValue is XAttribute xAttribute)
+                        result = xAttribute.Value;
+                    else
+                        result = firstValue.ToString();
+                }
                 else
                     result = element.ToString();
 
@@ -79,10 +87,18 @@ namespace PdfGenerator
 
                 if (element is null)
                     text = "";
-                else if (element is IEnumerable<XElement> xelements)
-                    text = xelements.FirstOrDefault()?.Value ?? "";
-                else if (element is IEnumerable<XAttribute> xattributes)
-                    text = xattributes.FirstOrDefault()?.Value ?? "";
+                else if (element is System.Collections.IEnumerable objects)
+                {
+                    var firstValue = objects.OfType<object>().FirstOrDefault();
+                    if (firstValue == null)
+                        text = "";
+                    else if (firstValue is XElement xElement)
+                        text = xElement.Value;
+                    else if (firstValue is XAttribute xAttribute)
+                        text = xAttribute.Value;
+                    else
+                        text = firstValue.ToString();
+                }
                 else
                     text = element.ToString();
 
@@ -93,5 +109,15 @@ namespace PdfGenerator
         }
 
         public static implicit operator ContextValue<T>(T value) => FromValue(value);
+        public static implicit operator ContextValue<T>(XPath value) => FromXPath(value.Path);
+    }
+
+    public struct XPath
+    {
+        public readonly string Path;
+        public XPath(string path)
+        {
+            this.Path = path;
+        }
     }
 }

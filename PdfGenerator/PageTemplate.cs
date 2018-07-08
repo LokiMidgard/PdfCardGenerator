@@ -17,8 +17,10 @@ namespace PdfGenerator
 
         public PdfDocument GetDocuments(IEnumerable<XElement> elements)
         {
-            var document = new PdfDocument();
-            document.PageLayout = PdfPageLayout.SinglePage;
+            var document = new PdfDocument
+            {
+                PageLayout = PdfPageLayout.SinglePage
+            };
             foreach (var context in elements)
             {
                 var page = document.AddPage();
@@ -32,6 +34,8 @@ namespace PdfGenerator
 
                     foreach (var item in this.Elements.OrderByDescending(x => x.ZIndex))
                     {
+                        if (!item.IsVisible.GetValue(context))
+                            continue;
 
                         if (item is TextElement textElement)
                         {
@@ -40,42 +44,116 @@ namespace PdfGenerator
 
                             var frame = textElement.Position.GetValue(context);
                             var startPosition = frame.Location;
-                            foreach (var run in textElement.Paragraphs.SelectMany(x => x.Runs).OfType<TextRun>())
+                            var currentPosition = startPosition;
+
+                            foreach (var paragraph in textElement.Paragraphs)
                             {
-                                if (!run.IsVisible.GetValue(context))
+                                if (!paragraph.IsVisible.GetValue(context))
                                     continue;
 
-                                var textForRun = run.Text.GetValue(context);
-                                if (string.IsNullOrEmpty(textForRun))
-                                    continue;
-
-                                var font = new XFont(run.FontName.GetValue(context), run.EmSize.GetValue(context), run.FontStyle.GetValue(context));
-
-
-
-                                var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
-                                var spaceSize = gfx.MeasureString(" ", font);
-
-                                var height = font.Height;
-                                var currentPosition = startPosition;
-
-                                for (int i = 0; i < wordSizes.Length; i++)
+                                var lines = new List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>>();
+                                var currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>();
+                                currentPosition = new XPoint(currentPosition.X, currentPosition.Y + paragraph.BeforeParagraph.GetValue(context));
+                                foreach (var run in paragraph.Runs)
                                 {
-                                    var w = wordSizes[i];
-                                    if (w.Size.Width + currentPosition.X > position.Right && i != 0 /*we can't make a linebreka before the first word*/)
+                                    if (!run.IsVisible.GetValue(context))
+                                        continue;
+
+                                    lines.Add(currentLine);
+
+                                    var font = new XFont(run.FontName.Value.GetValue(context), run.EmSize.Value.GetValue(context), run.FontStyle.Value.GetValue(context));
+                                    var height = font.Height * paragraph.Linespacing.GetValue(context);
+
+                                    if (run is LineBreakRun)
                                     {
-                                        // we are over the bounding. set current Position to next line
-
-                                        //TODO: Using Syllabification
-                                        currentPosition = new System.Drawing.PointF(startPosition.X, currentPosition.Y + height);
+                                        currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
                                     }
-                                    if (w.Size.Height + currentPosition.Y > position.Bottom)
-                                        break; // reached end of box
+                                    else if (run is TextRun textRun)
+                                    {
 
-                                    gfx.DrawString(w.Word, font, XBrushes.Black, currentPosition, XStringFormats.TopLeft);
-                                    currentPosition = new System.Drawing.PointF((float)(currentPosition.X + spaceSize.Width + w.Size.Width), currentPosition.Y);
+
+                                        var textForRun = textRun.Text.GetValue(context);
+                                        if (string.IsNullOrEmpty(textForRun))
+                                            continue;
+
+                                        var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
+                                        var spaceSize = gfx.MeasureString(" ", font);
+
+                                        int wordsToPrint;
+                                        for (int i = 0; i < wordSizes.Length; i += wordsToPrint)
+                                        {
+                                            double lineWidth = 0;
+                                            bool endOfLine = false;
+                                            for (wordsToPrint = 0; wordsToPrint + i < wordSizes.Length; wordsToPrint++)
+                                            {
+                                                var w = wordSizes[i + wordsToPrint];
+
+                                                if (w.Size.Width + currentPosition.X + lineWidth > position.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                                                {
+                                                    // we are over the bounding. set current Position to next line
+                                                    endOfLine = true;
+                                                    break;
+                                                }
+                                                lineWidth += w.Size.Width + (wordsToPrint == 0 ? 0 : spaceSize.Width);
+                                            }
+                                            wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
+
+                                            var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
+
+                                            currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context), gfx.MeasureString(textToPrint, font)));
+                                            currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
+
+                                            if (endOfLine)
+                                            {
+                                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
+                                                currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint currentPosition, XLineAlignment alignment, XSize size)>();
+                                                lines.Add(currentLine);
+                                            }
+
+                                            if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.Size.Height) + currentPosition.Y > position.Bottom)
+                                                goto END; // reached end of box
+
+
+                                        }
+                                    }
                                 }
+
+                                // now we calculate LineAlignment and print 
+                                END:;
+                                var maximumWidth = textElement.Position.GetValue(context).Width;
+                                foreach (var line in lines.Where(x => x.Count > 0))
+                                {
+                                    var leftmost = line.Min(x => x.printPosition.X);
+                                    var rightmost = line.Max(x => x.printPosition.X + x.size.Width);
+                                    var width = rightmost - leftmost;
+
+                                    double offset;
+                                    switch (paragraph.Alignment.GetValue(context))
+                                    {
+                                        case XLineAlignment.Near:
+                                            offset = 0;
+                                            break;
+                                        case XLineAlignment.Center:
+                                            offset = (maximumWidth - width) / 2;
+                                            break;
+                                        case XLineAlignment.Far:
+                                            offset = maximumWidth - width;
+                                            break;
+                                        case XLineAlignment.BaseLine:
+                                            throw new NotSupportedException("Not sure what this means");
+                                        default:
+                                            throw new NotSupportedException($"The Alignment {paragraph.Alignment} is not supported.");
+                                    }
+                                    foreach (var print in line)
+                                        gfx.DrawString(print.textToPrint, print.font, print.brush, new XPoint(print.printPosition.X + offset, print.printPosition.Y), XStringFormats.TopLeft);
+                                }
+                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + lines.Where(x => x.Count > 0).Last().Max(x => x.size.Height) + paragraph.AfterParagraph.GetValue(context));
+
                             }
+
+
+
+
 
                             //gfx.MeasureString(,, XStringFormats.BottomRight)
                         }
