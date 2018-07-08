@@ -17,7 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfSharp.Charting", "MigraD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dependencys", "dependencys", "{81CD6772-0199-4542-B1CF-05C01BA85A7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDFGeneratorClient", "PDFGeneratorClient\PDFGeneratorClient.csproj", "{35E84D63-980C-45D2-9E56-52114F18169B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDFGeneratorClient", "PDFGeneratorClient\PDFGeneratorClient.csproj", "{35E84D63-980C-45D2-9E56-52114F18169B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6EF272B9-19AF-480A-B385-8EE28BE4FC95}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.md = LICENSE.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
