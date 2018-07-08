@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="XMLSchema1"
-    targetNamespace="http://tempuri.org/PDFGenerator"
+<xs:schema id="XMLImport"
+    targetNamespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
     elementFormDefault="qualified"
-    xmlns="http://tempuri.org/PDFGenerator"
-    xmlns:mstns="http://tempuri.org/PDFGenerator"
+    xmlns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
+    xmlns:mstns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
   <xs:element name="Project">
@@ -23,42 +23,6 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-
-  <!--<xs:attributeGroup name="VisibleGroup">
-    <xs:attribute name="IsVisible" type="xs:boolean"/>
-    <xs:attribute name="IsVisiblePath" type="xs:string"/>
-  </xs:attributeGroup>
-
-  <xs:attributeGroup name="WordStyleGroup">
-    <xs:attributeGroup ref="mstns:VisibleGroup" />
-    <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
-    <xs:attribute name="EmSize" type="xs:double"/>
-    <xs:attribute name="FontName" type="xs:string"/>
-
-    <xs:attribute name="FontStylePath" type="xs:string"/>
-    <xs:attribute name="EmSizePath" type="xs:string"/>
-    <xs:attribute name="FontNamePath" type="xs:string"/>
-  </xs:attributeGroup>
-
-  <xs:attributeGroup name="ParagraphStyleGroup">
-    <xs:attributeGroup ref="mstns:WordStyleGroup" />
-
-    <xs:attribute name="Linespacing" default="1" type="xs:double"/>
-    <xs:attribute name="BeforeParagraph" type="mstns:Unit"/>
-    <xs:attribute name="AfterParagraph" type="mstns:Unit"/>
-
-    <xs:attribute name="LinespacingPath" default="1" type="xs:string"/>
-    <xs:attribute name="BeforeParagraphPath" type="xs:string"/>
-    <xs:attribute name="AfterParagraphPath" type="xs:string"/>
-
-  </xs:attributeGroup>-->
-
-  <!--<xs:attributeGroup name="PositionGroup">
-    <xs:attribute name="left" type="mstns:Unit"/>
-    <xs:attribute name="top" type="mstns:Unit"/>
-    <xs:attribute name="width" type="mstns:Unit"/>
-    <xs:attribute name="height" type="mstns:Unit"/>
-  </xs:attributeGroup>-->
 
   <xs:simpleType name="FontStyle">
     <xs:restriction base="xs:string">
@@ -84,45 +48,6 @@
       <xs:pattern value="[0-9]+(\.[0-9]+)? ?(pt|mm|cm|in|pu)"/>
     </xs:restriction>
   </xs:simpleType>
-
-
-  <!--<xs:attributeGroup name="baseElementGroup">
-    <xs:attributeGroup ref="VisibleGroup"/>
-    <xs:attributeGroup ref="PositionGroup"/>
-  </xs:attributeGroup>-->
-
-  <!--<xs:complexType name="imageElement">
-    <xs:attribute name="Path" type="xs:string"/>
-    <xs:attributeGroup ref="mstns:baseElementGroup"/>
-  </xs:complexType>-->
-
-  <!--<xs:complexType name="textElement">
-    <xs:sequence>
-      <xs:element name="Paragraph" maxOccurs="unbounded">
-        <xs:complexType>
-          <xs:choice maxOccurs="unbounded">
-            <xs:element name="LineBreak">
-              <xs:complexType>
-                <xs:attributeGroup ref="mstns:WordStyleGroup"/>
-              </xs:complexType>
-            </xs:element>
-            <xs:element name="Run">
-              <xs:complexType >
-                <xs:simpleContent>
-                  <xs:extension base="xs:string">
-                    <xs:attributeGroup ref="mstns:WordStyleGroup"/>
-                  </xs:extension>
-                </xs:simpleContent>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-          <xs:attributeGroup ref="mstns:ParagraphStyleGroup"/>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-    <xs:attributeGroup ref="mstns:baseElementGroup"/>
-  </xs:complexType>-->
-
 
   <xs:complexType name="BaseElement" abstract="true">
 

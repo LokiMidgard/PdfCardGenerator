@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
 namespace PdfGenerator
 {
 
+    [System.Diagnostics.DebuggerDisplay("Value: {value} / XPath:{xpath}")]
     public struct ContextValue<T>
     {
         private static ContextValue<T> Empty { get; } = new ContextValue<T>();
@@ -29,7 +31,7 @@ namespace PdfGenerator
         public static ContextValue<T> FromValue(T value) => new ContextValue<T>(value, true, null);
         public static ContextValue<T> FromXPath(string xPath) => new ContextValue<T>(default, false, xPath);
 
-        public T GetValue(XElement context)
+        public T GetValue(XElement context, IXmlNamespaceResolver resolver)
         {
             if (!this.wasConstructed)
                 return default;
@@ -37,7 +39,7 @@ namespace PdfGenerator
             if (this.hasConcretValue)
                 return this.value;
 
-            var element = context.XPathEvaluate(this.xpath);
+            var element = context.XPathEvaluate(this.xpath, resolver);
 
             if (typeof(T) == typeof(bool))
             {
@@ -67,15 +69,17 @@ namespace PdfGenerator
                     result = s;
                 else if (element is System.Collections.IEnumerable objects)
                 {
-                    var firstValue = objects.OfType<object>().FirstOrDefault();
-                    if (firstValue == null)
-                        result = "";
-                    else if (firstValue is XElement xElement)
-                        result = xElement.Value;
-                    else if (firstValue is XAttribute xAttribute)
-                        result = xAttribute.Value;
-                    else
-                        result = firstValue.ToString();
+                    result = string.Join(" ", objects.OfType<object>().Select(firstValue =>
+                    {
+                        if (firstValue == null)
+                            return null;
+                        else if (firstValue is XElement xElement)
+                            return xElement.Value;
+                        else if (firstValue is XAttribute xAttribute)
+                            return xAttribute.Value;
+                        else
+                            return firstValue.ToString();
+                    }).Where(x => x != null));
                 }
                 else
                     result = element.ToString();
@@ -121,7 +125,7 @@ namespace PdfGenerator
             this.Path = path;
         }
 
-        public static implicit operator XPath(string value) => new XPath(value);
+        public static explicit operator XPath(string value) => new XPath(value);
 
     }
 }

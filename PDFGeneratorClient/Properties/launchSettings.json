@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PDFCardGenerator.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "-p Project.xml -i C:\\Users\\patri\\Source\\Repos\\nota\\input\\static\\data\\nota.xml -o test.pdf"
+    }
+  }
+}

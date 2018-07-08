@@ -32,6 +32,8 @@ namespace PdfGenerator
     {
         public IReadOnlyList<Run> Runs { get; }
 
+        public const string DEFAULT_FONT_NAME = "Verdana";
+        public const double DEFAULT_EM_SIZE = 12.0;
         private readonly List<Run> runs;
         /// <summary>
         /// Linespace relativ to normal linespacing.
@@ -42,8 +44,8 @@ namespace PdfGenerator
         public ContextValue<XUnit> AfterParagraph { get; set; }
 
         public ContextValue<XFontStyle> FontStyle { get; set; } = XFontStyle.Regular;
-        public ContextValue<double> EmSize { get; set; } = 12.0;
-        public ContextValue<string> FontName { get; set; } = "Verdana";
+        public ContextValue<double> EmSize { get; set; } = DEFAULT_EM_SIZE;
+        public ContextValue<string> FontName { get; set; } = DEFAULT_FONT_NAME;
         public ContextValue<bool> IsVisible { get; set; } = true;
         public ContextValue<XLineAlignment> Alignment { get; set; }
 
@@ -93,7 +95,18 @@ namespace PdfGenerator
 
         public ContextValue<XFontStyle>? FontStyle { get => this._fontStyle ?? this.Paragraph.FontStyle; set => this._fontStyle = value; }
         public ContextValue<double>? EmSize { get => this._emSize ?? this.Paragraph.EmSize; set => this._emSize = value; }
-        public ContextValue<string>? FontName { get => this._fontName ?? this.Paragraph.FontName; set => this._fontName = value; }
+        public ContextValue<string>? FontName
+        {
+            get => this._fontName ?? this.Paragraph.FontName; set
+            {
+                if (!value.HasValue)
+                    this._fontName = null;
+                else if (!value.Value.IsXPath && value.Value.GetValue(null, null) == null)
+                    this._fontName = null;
+                else
+                    this._fontName = value.Value;
+            }
+        }
 
         public ContextValue<bool> IsVisible { get; set; } = true;
         public Paragraph Paragraph { get; }

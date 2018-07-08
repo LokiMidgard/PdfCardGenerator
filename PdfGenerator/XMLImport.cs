@@ -20,8 +20,10 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/PDFGenerator")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace="http://tempuri.org/PDFGenerator", IsNullable=false)]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
     public partial class Project {
         
         private ProjectTemplate[] templateField;
@@ -43,7 +45,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public partial class ProjectTemplate {
         
         private BaseElement[] itemsField;
@@ -105,7 +108,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public partial class ImageElement : BaseElement {
         
         private string imageLocationPathField;
@@ -142,7 +146,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public abstract partial class BaseElement {
         
         private string leftField;
@@ -270,7 +275,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public abstract partial class Run {
         
         private FontStyle fontStyleField;
@@ -381,7 +387,8 @@ namespace Serilizer {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public enum FontStyle {
         
         /// <remarks/>
@@ -408,7 +415,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public partial class TextRun : Run {
         
         private string itemField;
@@ -443,7 +451,8 @@ namespace Serilizer {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator", IncludeInSchema=false)]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IncludeInSchema=false)]
     public enum ItemChoiceType {
         
         /// <remarks/>
@@ -458,7 +467,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public partial class LineBreak : Run {
     }
     
@@ -467,7 +477,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public partial class TextElement : BaseElement {
         
         private TextElementParagraph[] paragraphField;
@@ -489,7 +500,8 @@ namespace Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public partial class TextElementParagraph {
         
         private Run[] itemsField;
@@ -684,7 +696,8 @@ namespace Serilizer {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/PDFGenerator")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
     public enum Alignment {
         
         /// <remarks/>

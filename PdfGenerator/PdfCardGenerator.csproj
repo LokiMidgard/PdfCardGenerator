@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigraDoc\MigraDoc\src\MigraDoc.RtfRendering\MigraDoc.RtfRendering.csproj" />
+    <ProjectReference Include="..\MigraDoc\PDFsharp\src\PdfSharp\PdfSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

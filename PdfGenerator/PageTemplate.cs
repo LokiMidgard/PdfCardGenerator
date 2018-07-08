@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -18,11 +19,12 @@ namespace PdfGenerator
 
         public IList<Element> Elements { get; set; } = new List<Element>();
 
-        public PdfDocument GetDocuments(XDocument document)
+        public PdfDocument GetDocuments(XDocument document, IXmlNamespaceResolver resolver)
         {
-            return GetDocuments(document.XPathSelectElements(this.ContextPath.Path));
+
+            return GetDocuments(document.XPathSelectElements(this.ContextPath.Path, resolver), resolver);
         }
-        private PdfDocument GetDocuments(IEnumerable<XElement> elements)
+        private PdfDocument GetDocuments(IEnumerable<XElement> elements, IXmlNamespaceResolver resolver)
         {
             var document = new PdfDocument
             {
@@ -39,37 +41,37 @@ namespace PdfGenerator
                 {
                     // Create a font
 
-                    foreach (var item in this.Elements.OrderByDescending(x => x.ZIndex))
+                    foreach (var item in this.Elements.OrderByDescending(x => x.ZIndex.GetValue(context, resolver)))
                     {
-                        if (!item.IsVisible.GetValue(context))
+                        if (!item.IsVisible.GetValue(context, resolver))
                             continue;
 
                         if (item is TextElement textElement)
                         {
-                            var position = textElement.Position.GetValue(context);
-                            var zIndex = textElement.ZIndex.GetValue(context);
+                            var position = textElement.Position.GetValue(context, resolver);
+                            var zIndex = textElement.ZIndex.GetValue(context, resolver);
 
-                            var frame = textElement.Position.GetValue(context);
+                            var frame = textElement.Position.GetValue(context, resolver);
                             var startPosition = frame.Location;
                             var currentPosition = startPosition;
 
                             foreach (var paragraph in textElement.Paragraphs)
                             {
-                                if (!paragraph.IsVisible.GetValue(context))
+                                if (!paragraph.IsVisible.GetValue(context, resolver))
                                     continue;
 
                                 var lines = new List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>>();
                                 var currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>();
-                                currentPosition = new XPoint(currentPosition.X, currentPosition.Y + paragraph.BeforeParagraph.GetValue(context));
+                                currentPosition = new XPoint(currentPosition.X, currentPosition.Y + paragraph.BeforeParagraph.GetValue(context, resolver));
                                 foreach (var run in paragraph.Runs)
                                 {
-                                    if (!run.IsVisible.GetValue(context))
+                                    if (!run.IsVisible.GetValue(context, resolver))
                                         continue;
 
                                     lines.Add(currentLine);
 
-                                    var font = new XFont(run.FontName.Value.GetValue(context), run.EmSize.Value.GetValue(context), run.FontStyle.Value.GetValue(context));
-                                    var height = font.Height * paragraph.Linespacing.GetValue(context);
+                                    var font = new XFont(run.FontName.Value.GetValue(context, resolver), run.EmSize.Value.GetValue(context, resolver), run.FontStyle.Value.GetValue(context, resolver));
+                                    var height = font.Height * paragraph.Linespacing.GetValue(context, resolver);
 
                                     if (run is LineBreakRun)
                                     {
@@ -79,7 +81,7 @@ namespace PdfGenerator
                                     {
 
 
-                                        var textForRun = textRun.Text.GetValue(context);
+                                        var textForRun = textRun.Text.GetValue(context, resolver);
                                         if (string.IsNullOrEmpty(textForRun))
                                             continue;
 
@@ -107,7 +109,7 @@ namespace PdfGenerator
 
                                             var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
 
-                                            currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context), gfx.MeasureString(textToPrint, font)));
+                                            currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, font)));
                                             currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
 
                                             if (endOfLine)
@@ -127,7 +129,7 @@ namespace PdfGenerator
 
                                 // now we calculate LineAlignment and print 
                                 END:;
-                                var maximumWidth = textElement.Position.GetValue(context).Width;
+                                var maximumWidth = textElement.Position.GetValue(context, resolver).Width;
                                 foreach (var line in lines.Where(x => x.Count > 0))
                                 {
                                     var leftmost = line.Min(x => x.printPosition.X);
@@ -135,7 +137,7 @@ namespace PdfGenerator
                                     var width = rightmost - leftmost;
 
                                     double offset;
-                                    switch (paragraph.Alignment.GetValue(context))
+                                    switch (paragraph.Alignment.GetValue(context, resolver))
                                     {
                                         case XLineAlignment.Near:
                                             offset = 0;
@@ -154,7 +156,7 @@ namespace PdfGenerator
                                     foreach (var print in line)
                                         gfx.DrawString(print.textToPrint, print.font, print.brush, new XPoint(print.printPosition.X + offset, print.printPosition.Y), XStringFormats.TopLeft);
                                 }
-                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + lines.Where(x => x.Count > 0).Last().Max(x => x.size.Height) + paragraph.AfterParagraph.GetValue(context));
+                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + lines.Where(x => x.Count > 0).LastOrDefault()?.Max(x => x.size.Height) ?? 0 + paragraph.AfterParagraph.GetValue(context, resolver));
 
                             }
 
@@ -185,4 +187,6 @@ namespace PdfGenerator
             return document;
         }
     }
+
+
 }
