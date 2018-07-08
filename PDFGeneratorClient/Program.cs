@@ -54,10 +54,9 @@ namespace PDFGenerator.Client
             {
                 var options = p.Object;
 
-                using (var projectStream = System.IO.File.OpenRead(options.ProjectPath))
                 using (var xmlStream = System.IO.File.OpenRead(options.DataPath))
                 {
-                    var project = PdfGenerator.Project.Load(projectStream);
+                    var project = PdfGenerator.Project.Load(options.ProjectPath);
 
                     var xml = XDocument.Load(xmlStream);
 

@@ -10,7 +10,7 @@ namespace PdfGenerator
 {
 
     [System.Diagnostics.DebuggerDisplay("Value: {value} / XPath:{xpath}")]
-    public struct ContextValue<T>
+    public struct ContextValue<T> : IContextValue<T>
     {
         private static ContextValue<T> Empty { get; } = new ContextValue<T>();
 

@@ -20,7 +20,14 @@ namespace PdfGenerator
         public IEnumerable<PageTemplate> Templates { get; set; }
         public XDocument Document { get; private set; }
 
-        public static Project Load(System.IO.Stream stream)
+
+        public static Project Load(string path)
+        {
+            var file = new FileInfo(path);
+            using (var stream = file.OpenRead())
+                return Load(stream, file.Directory);
+        }
+        public static Project Load(System.IO.Stream stream, DirectoryInfo workingDirectory)
         {
 
             var doc = XDocument.Load(stream);
@@ -98,7 +105,11 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(imageElement),
                                 Position = GetPosition(imageElement),
                                 ZIndex = imageElement.ZPosition,
-                                ImagePath = GetImageLocation()
+                                ImagePath = new RelativePath()
+                                {
+                                    Path = GetImageLocation(),
+                                    WorkingDirectory = workingDirectory
+                                }
                             };
 
                             ContextValue<string> GetImageLocation()

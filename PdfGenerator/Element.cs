@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -135,6 +136,21 @@ namespace PdfGenerator
 
     public class ImageElement : Element
     {
-        public ContextValue<string> ImagePath { get; set; }
+
+        public RelativePath ImagePath { get; set; }
+    }
+
+    public struct RelativePath : IContextValue<string>
+    {
+
+        public ContextValue<string> Path { get; set; }
+        public System.IO.DirectoryInfo WorkingDirectory { get; set; }
+
+        public string GetValue(XElement context, IXmlNamespaceResolver resolver)
+        {
+            var relativePath = Path.GetValue(context, resolver);
+            return System.IO.Path.Combine(this.WorkingDirectory.FullName, relativePath);
+
+        }
     }
 }

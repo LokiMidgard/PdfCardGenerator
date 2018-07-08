@@ -48,119 +48,7 @@ namespace PdfGenerator
 
                         if (item is TextElement textElement)
                         {
-                            var position = textElement.Position.GetValue(context, resolver);
-                            var zIndex = textElement.ZIndex.GetValue(context, resolver);
-
-                            var frame = textElement.Position.GetValue(context, resolver);
-                            var startPosition = frame.Location;
-                            var currentPosition = startPosition;
-
-                            foreach (var paragraph in textElement.Paragraphs)
-                            {
-                                if (!paragraph.IsVisible.GetValue(context, resolver))
-                                    continue;
-
-                                var lines = new List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>>();
-                                var currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>();
-                                currentPosition = new XPoint(currentPosition.X, currentPosition.Y + paragraph.BeforeParagraph.GetValue(context, resolver));
-                                foreach (var run in paragraph.Runs)
-                                {
-                                    if (!run.IsVisible.GetValue(context, resolver))
-                                        continue;
-
-                                    lines.Add(currentLine);
-
-                                    var font = new XFont(run.FontName.Value.GetValue(context, resolver), run.EmSize.Value.GetValue(context, resolver), run.FontStyle.Value.GetValue(context, resolver));
-                                    var height = font.Height * paragraph.Linespacing.GetValue(context, resolver);
-
-                                    if (run is LineBreakRun)
-                                    {
-                                        currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
-                                    }
-                                    else if (run is TextRun textRun)
-                                    {
-
-
-                                        var textForRun = textRun.Text.GetValue(context, resolver);
-                                        if (string.IsNullOrEmpty(textForRun))
-                                            continue;
-
-                                        var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
-                                        var spaceSize = gfx.MeasureString(" ", font);
-
-                                        int wordsToPrint;
-                                        for (int i = 0; i < wordSizes.Length; i += wordsToPrint)
-                                        {
-                                            double lineWidth = 0;
-                                            bool endOfLine = false;
-                                            for (wordsToPrint = 0; wordsToPrint + i < wordSizes.Length; wordsToPrint++)
-                                            {
-                                                var w = wordSizes[i + wordsToPrint];
-
-                                                if (w.Size.Width + currentPosition.X + lineWidth > position.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
-                                                {
-                                                    // we are over the bounding. set current Position to next line
-                                                    endOfLine = true;
-                                                    break;
-                                                }
-                                                lineWidth += w.Size.Width + (wordsToPrint == 0 ? 0 : spaceSize.Width);
-                                            }
-                                            wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
-
-                                            var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
-
-                                            currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, font)));
-                                            currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
-
-                                            if (endOfLine)
-                                            {
-                                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
-                                                currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint currentPosition, XLineAlignment alignment, XSize size)>();
-                                                lines.Add(currentLine);
-                                            }
-
-                                            if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.Size.Height) + currentPosition.Y > position.Bottom)
-                                                goto END; // reached end of box
-
-
-                                        }
-                                    }
-                                }
-
-                                // now we calculate LineAlignment and print 
-                                END:;
-                                var maximumWidth = textElement.Position.GetValue(context, resolver).Width;
-                                foreach (var line in lines.Where(x => x.Count > 0))
-                                {
-                                    var leftmost = line.Min(x => x.printPosition.X);
-                                    var rightmost = line.Max(x => x.printPosition.X + x.size.Width);
-                                    var width = rightmost - leftmost;
-
-                                    double offset;
-                                    switch (paragraph.Alignment.GetValue(context, resolver))
-                                    {
-                                        case XLineAlignment.Near:
-                                            offset = 0;
-                                            break;
-                                        case XLineAlignment.Center:
-                                            offset = (maximumWidth - width) / 2;
-                                            break;
-                                        case XLineAlignment.Far:
-                                            offset = maximumWidth - width;
-                                            break;
-                                        case XLineAlignment.BaseLine:
-                                            throw new NotSupportedException("Not sure what this means");
-                                        default:
-                                            throw new NotSupportedException($"The Alignment {paragraph.Alignment} is not supported.");
-                                    }
-                                    foreach (var print in line)
-                                        gfx.DrawString(print.textToPrint, print.font, print.brush, new XPoint(print.printPosition.X + offset, print.printPosition.Y), XStringFormats.TopLeft);
-                                }
-                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + lines.Where(x => x.Count > 0).LastOrDefault()?.Max(x => x.size.Height) ?? 0 + paragraph.AfterParagraph.GetValue(context, resolver));
-
-                            }
-
-
+                            HandleTextElement(resolver, context, gfx, textElement);
 
 
 
@@ -168,6 +56,10 @@ namespace PdfGenerator
                         }
                         else if (item is ImageElement imageElement)
                         {
+                            var path = imageElement.ImagePath.GetValue(context, resolver);
+                            var position = imageElement.Position.GetValue(context, resolver);
+                            using (var image = XImage.FromFile(path))
+                                gfx.DrawImage(image, position);
 
                         }
                         else
@@ -185,6 +77,122 @@ namespace PdfGenerator
 
             }
             return document;
+        }
+
+        private static void HandleTextElement(IXmlNamespaceResolver resolver, XElement context, XGraphics gfx, TextElement textElement)
+        {
+            var position = textElement.Position.GetValue(context, resolver);
+            var zIndex = textElement.ZIndex.GetValue(context, resolver);
+
+            var frame = textElement.Position.GetValue(context, resolver);
+            var startPosition = frame.Location;
+            var currentPosition = startPosition;
+
+            foreach (var paragraph in textElement.Paragraphs)
+            {
+                if (!paragraph.IsVisible.GetValue(context, resolver))
+                    continue;
+
+                var lines = new List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>>();
+                var currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>();
+                currentPosition = new XPoint(currentPosition.X, currentPosition.Y + paragraph.BeforeParagraph.GetValue(context, resolver));
+                foreach (var run in paragraph.Runs)
+                {
+                    if (!run.IsVisible.GetValue(context, resolver))
+                        continue;
+
+                    lines.Add(currentLine);
+
+                    var font = new XFont(run.FontName.Value.GetValue(context, resolver), run.EmSize.Value.GetValue(context, resolver), run.FontStyle.Value.GetValue(context, resolver));
+                    var height = font.Height * paragraph.Linespacing.GetValue(context, resolver);
+
+                    if (run is LineBreakRun)
+                    {
+                        currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
+                    }
+                    else if (run is TextRun textRun)
+                    {
+
+
+                        var textForRun = textRun.Text.GetValue(context, resolver);
+                        if (string.IsNullOrEmpty(textForRun))
+                            continue;
+
+                        var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
+                        var spaceSize = gfx.MeasureString(" ", font);
+
+                        int wordsToPrint;
+                        for (int i = 0; i < wordSizes.Length; i += wordsToPrint)
+                        {
+                            double lineWidth = 0;
+                            bool endOfLine = false;
+                            for (wordsToPrint = 0; wordsToPrint + i < wordSizes.Length; wordsToPrint++)
+                            {
+                                var w = wordSizes[i + wordsToPrint];
+
+                                if (w.Size.Width + currentPosition.X + lineWidth > position.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                                {
+                                    // we are over the bounding. set current Position to next line
+                                    endOfLine = true;
+                                    break;
+                                }
+                                lineWidth += w.Size.Width + (wordsToPrint == 0 ? 0 : spaceSize.Width);
+                            }
+                            wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
+
+                            var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
+
+                            currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, font)));
+                            currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
+
+                            if (endOfLine)
+                            {
+                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
+                                currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint currentPosition, XLineAlignment alignment, XSize size)>();
+                                lines.Add(currentLine);
+                            }
+
+                            if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.Size.Height) + currentPosition.Y > position.Bottom)
+                                goto END; // reached end of box
+
+
+                        }
+                    }
+                }
+
+                // now we calculate LineAlignment and print 
+                END:;
+                var maximumWidth = textElement.Position.GetValue(context, resolver).Width;
+                foreach (var line in lines.Where(x => x.Count > 0))
+                {
+                    var leftmost = line.Min(x => x.printPosition.X);
+                    var rightmost = line.Max(x => x.printPosition.X + x.size.Width);
+                    var width = rightmost - leftmost;
+
+                    double offset;
+                    switch (paragraph.Alignment.GetValue(context, resolver))
+                    {
+                        case XLineAlignment.Near:
+                            offset = 0;
+                            break;
+                        case XLineAlignment.Center:
+                            offset = (maximumWidth - width) / 2;
+                            break;
+                        case XLineAlignment.Far:
+                            offset = maximumWidth - width;
+                            break;
+                        case XLineAlignment.BaseLine:
+                            throw new NotSupportedException("Not sure what this means");
+                        default:
+                            throw new NotSupportedException($"The Alignment {paragraph.Alignment} is not supported.");
+                    }
+                    foreach (var print in line)
+                        gfx.DrawString(print.textToPrint, print.font, print.brush, new XPoint(print.printPosition.X + offset, print.printPosition.Y), XStringFormats.TopLeft);
+                }
+                currentPosition = new XPoint(startPosition.X, currentPosition.Y + lines.Where(x => x.Count > 0).LastOrDefault()?.Max(x => x.size.Height) ?? 0 + paragraph.AfterParagraph.GetValue(context, resolver));
+
+            }
+
         }
     }
 
