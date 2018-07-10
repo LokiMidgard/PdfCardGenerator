@@ -41,6 +41,7 @@ namespace PdfGenerator
             {
                 return new PageTemplate
                 {
+                    XSLT = original.Xslt != null ? (RelativePath?)(new RelativePath() { Path = original.Xslt, WorkingDirectory = workingDirectory } ): null,
                     ContextPath = (XPath)original.Context,
                     Height = original.Height,
                     Width = original.Width,

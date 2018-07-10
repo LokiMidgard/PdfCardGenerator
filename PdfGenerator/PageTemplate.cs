@@ -2,11 +2,13 @@
 using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using System.Xml.Xsl;
 
 namespace PdfGenerator
 {
@@ -18,6 +20,7 @@ namespace PdfGenerator
         public XPath ContextPath { get; set; }
 
         public IList<Element> Elements { get; set; } = new List<Element>();
+        public RelativePath? XSLT { get; internal set; }
 
         public PdfDocument GetDocuments(XDocument document, IXmlNamespaceResolver resolver)
         {
@@ -26,6 +29,22 @@ namespace PdfGenerator
         }
         private PdfDocument GetDocuments(IEnumerable<XElement> elements, IXmlNamespaceResolver resolver)
         {
+            if (XSLT != null)
+            {
+                elements = elements.Select(e =>
+                {
+                    var transformer = new XslCompiledTransform();
+                    transformer.Load(XSLT.Value.GetValue(e, resolver));
+                    //transformer.XmlResolver = resolver;
+                    var builder = new StringBuilder();
+                    using (var writer = XmlWriter.Create(builder))
+                    {
+                        transformer.Transform(e.CreateNavigator(), writer);
+                        return XDocument.Parse(builder.ToString()).Root;
+                    }
+                }).ToArray();
+            }
+
             var document = new PdfDocument
             {
                 PageLayout = PdfPageLayout.SinglePage
@@ -82,13 +101,127 @@ namespace PdfGenerator
         private static void HandleTextElement(IXmlNamespaceResolver resolver, XElement context, XGraphics gfx, TextElement textElement)
         {
             var position = textElement.Position.GetValue(context, resolver);
-            var zIndex = textElement.ZIndex.GetValue(context, resolver);
 
             var frame = textElement.Position.GetValue(context, resolver);
             var startPosition = frame.Location;
             var currentPosition = startPosition;
 
-            foreach (var paragraph in textElement.Paragraphs)
+            IEnumerable<Paragraph> TransformParapgraps(Paragraph oldP )
+            {
+                var currentP = new Paragraph
+                {
+                    AfterParagraph = oldP.AfterParagraph,
+                    Alignment = oldP.Alignment,
+                    BeforeParagraph = oldP.BeforeParagraph,
+                    EmSize = oldP.EmSize,
+                    FontName = oldP.FontName,
+                    FontStyle = oldP.FontStyle,
+                    IsVisible = oldP.IsVisible,
+                    Linespacing = oldP.Linespacing
+                };
+                bool isMarkdown = true;
+                foreach (var item in oldP.Runs)
+                {
+                    if (item is LineBreakRun lineBreak)
+                        currentP.AddLineBreak(lineBreak.FontStyle, lineBreak.EmSize, lineBreak.FontName, lineBreak.IsVisible);
+
+                    else if (item is TextRun textRun)
+                    {
+                        var text = textRun.Text.GetValue(context, resolver);
+                        var builder = new StringBuilder();
+                        if (isMarkdown)
+                        {
+                            var lastLinebreaks = 0;
+                            var lastSpaces = 0;
+
+                            foreach (var c in text)
+                            {
+                                if (c == '\n')
+                                {
+                                    lastLinebreaks++;
+                                }
+                                else if (c == '\r')
+                                {
+                                    // ignore  \r
+                                }
+                                else if (c == ' ')
+                                {
+                                    lastSpaces++;
+                                }
+                                else
+                                {
+                                    if (lastLinebreaks == 1 && lastSpaces >= 2)
+                                    {
+                                        // we make a linebreak and write everything already in our buffer
+                                        currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                                        currentP.AddLineBreak();
+                                        builder.Clear();
+                                    }
+                                    else if (lastLinebreaks > 1)
+                                    {
+                                        // we make a new paragraph
+                                        currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                                        yield return currentP;
+                                        currentP = new Paragraph()
+                                        {
+                                            AfterParagraph = currentP.AfterParagraph,
+                                            Alignment = currentP.Alignment,
+                                            BeforeParagraph = currentP.BeforeParagraph,
+                                            EmSize = currentP.EmSize,
+                                            FontName = currentP.FontName,
+                                            FontStyle = currentP.FontStyle,
+                                            IsVisible = currentP.IsVisible,
+                                            Linespacing = currentP.Linespacing
+                                        };
+                                        builder.Clear();
+                                    }
+                                    else if (lastSpaces > 0)
+                                    {
+                                        builder.Append(' ');
+                                    }
+
+                                    builder.Append(c);
+                                    lastSpaces = 0;
+                                    lastLinebreaks = 0;
+                                }
+                            }
+                            if (builder.Length > 0)
+                                currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                        }
+                        else
+                        {
+                            foreach (var c in text)
+                            {
+                                if (c == '\n')
+                                {
+                                    if (builder.Length > 0)
+                                        currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                                    currentP.AddLineBreak();
+                                    builder.Clear();
+                                }
+                                else if (c == '\r')
+                                {
+                                    // ignore  \r
+                                }
+                                else
+                                {
+                                    builder.Append(c);
+                                }
+                            }
+                            if (builder.Length > 0)
+                                currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+
+                        }
+
+                    }
+
+                }
+
+                yield return currentP;
+            }
+
+            var paragraphs = textElement.Paragraphs.SelectMany(TransformParapgraps);
+            foreach (var paragraph in paragraphs)
             {
                 if (!paragraph.IsVisible.GetValue(context, resolver))
                     continue;

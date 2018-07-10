@@ -57,6 +57,8 @@ namespace Serilizer {
         
         private string heightField;
         
+        private string xsltField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Image", typeof(ImageElement))]
         [System.Xml.Serialization.XmlElementAttribute("Text", typeof(TextElement))]
@@ -99,6 +101,17 @@ namespace Serilizer {
             }
             set {
                 this.heightField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Xslt {
+            get {
+                return this.xsltField;
+            }
+            set {
+                this.xsltField = value;
             }
         }
     }
