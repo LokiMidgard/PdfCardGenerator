@@ -71,43 +71,55 @@
       <xs:extension base="BaseElement">
         <xs:choice maxOccurs="unbounded">
           <xs:element ref="mstns:Paragraph"/>
-        <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
+          <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
         </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
+
+
+  <xs:complexType name="AbstractParagraph" abstract="true">
+    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="IsVisiblePath" type="xs:string"/>
+  </xs:complexType>
+
   <xs:complexType name="ForeEachParagraph">
-            <xs:choice>
-              <xs:element ref="Paragraph"/>
-        <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
-            </xs:choice>
-          </xs:complexType>
-  
-         <xs:element name="Paragraph" >
-            <xs:complexType>
-              <xs:choice maxOccurs="unbounded">
-                <xs:element ref="LineBreak"/>
-                <xs:element ref="mstns:TextRun"/>
+    <xs:complexContent>
+      <xs:extension base="AbstractParagraph">
+
+        <xs:choice>
+          <xs:element ref="Paragraph"/>
+          <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="Paragraph">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="AbstractParagraph">
+          <xs:choice maxOccurs="unbounded">
+            <xs:element ref="LineBreak"/>
+            <xs:element ref="mstns:TextRun"/>
             <xs:element ref="ForEach" />
-              </xs:choice>
+          </xs:choice>
 
+          <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
+          <xs:attribute name="EmSize" type="xs:double"/>
+          <xs:attribute name="FontName" type="xs:string"/>
 
-              <xs:attribute name="IsVisible" type="xs:boolean"/>
-              <xs:attribute name="IsVisiblePath" type="xs:string"/>
+          <xs:attribute name="Linespacing" default="1" type="xs:double"/>
+          <xs:attribute name="BeforeParagraph" type="mstns:Unit"/>
+          <xs:attribute name="AfterParagraph" type="mstns:Unit"/>
+          <xs:attribute name="Alignment" type="mstns:Alignment"/>
+        </xs:extension>
+      </xs:complexContent>
 
-              <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
-              <xs:attribute name="EmSize" type="xs:double"/>
-              <xs:attribute name="FontName" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
 
-              <xs:attribute name="Linespacing" default="1" type="xs:double"/>
-              <xs:attribute name="BeforeParagraph" type="mstns:Unit"/>
-              <xs:attribute name="AfterParagraph" type="mstns:Unit"/>
-              <xs:attribute name="Alignment" type="mstns:Alignment"/>
-
-            </xs:complexType>
-          </xs:element>
-   
 
   <xs:element name="LineBreak">
     <xs:complexType>

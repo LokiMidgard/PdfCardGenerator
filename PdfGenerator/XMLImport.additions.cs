@@ -23,9 +23,8 @@ namespace Serilizer
     {
     }
 
-    public partial class TextElementParagraph : IVisible
-    {
-    }
+    public partial class AbstractParagraph : IVisible { }
+
 
     public partial class Run : IVisible
     {
