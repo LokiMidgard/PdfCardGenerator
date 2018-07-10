@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="XMLImport"
-    targetNamespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
-    elementFormDefault="qualified"
-    xmlns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
-    xmlns:mstns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
->
+  targetNamespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
+  elementFormDefault="qualified"
+  xmlns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
+  xmlns:mstns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  >
   <xs:element name="Project">
     <xs:complexType>
       <xs:sequence>
@@ -15,9 +16,10 @@
               <xs:element name="Image" type="mstns:ImageElement" />
               <xs:element name="Text" type="mstns:TextElement" />
             </xs:choice>
-            <xs:attribute name="Context" type="xs:string"/>
-            <xs:attribute name="Width" type="mstns:Unit"/>
-            <xs:attribute name="Height" type="mstns:Unit"/>
+            <xs:attribute name="Context" type="xs:string" use="required"/>
+            <xs:attribute name="Width" type="mstns:Unit" use="required"/>
+            <xs:attribute name="Height" type="mstns:Unit" use="required"/>
+            <xs:attribute name="Xslt" type="xs:string" use="optional"/>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -42,7 +44,7 @@
       <xs:enumeration value="Far" />
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:simpleType name="Unit">
     <xs:restriction base="xs:string">
       <xs:pattern value="[0-9]+(\.[0-9]+)? ?(pt|mm|cm|in|pu)"/>
@@ -63,16 +65,31 @@
 
 
   </xs:complexType>
-  
+
   <xs:complexType name="TextElement">
     <xs:complexContent>
       <xs:extension base="BaseElement">
-        <xs:sequence>
-          <xs:element name="Paragraph" maxOccurs="unbounded">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="mstns:Paragraph"/>
+        <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ForeEachParagraph">
+            <xs:choice>
+              <xs:element ref="Paragraph"/>
+        <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
+            </xs:choice>
+          </xs:complexType>
+  
+         <xs:element name="Paragraph" >
             <xs:complexType>
               <xs:choice maxOccurs="unbounded">
-                <xs:element name="LineBreak" type="LineBreak"/>
-                <xs:element name="Run" type="TextRun" />
+                <xs:element ref="LineBreak"/>
+                <xs:element ref="mstns:TextRun"/>
+            <xs:element ref="ForEach" />
               </xs:choice>
 
 
@@ -90,39 +107,54 @@
 
             </xs:complexType>
           </xs:element>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+   
 
+  <xs:element name="LineBreak">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="Run">
 
-  <xs:complexType name="LineBreak">
-    <xs:complexContent>
-      <xs:extension base="Run">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
 
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="TextRun">
-    <xs:complexContent>
-      <xs:extension base="Run">
-        <xs:choice>
-          <xs:element  name="Text" type="xs:string"/>
-          <xs:element  name="TextPath" type="xs:string"/>
-        </xs:choice>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+  <xs:element name="ForEach">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="Run">
+          <xs:choice maxOccurs="unbounded">
+            <xs:element ref="ForEach" />
+            <xs:element ref="TextRun" />
+            <xs:element ref="LineBreak" />
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TextRun">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="Run">
+          <xs:choice>
+            <xs:element name="Text" type="xs:string"/>
+            <xs:element name="TextPath" type="xs:string"/>
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
 
   <xs:complexType name="Run" abstract="true">
-    
-      <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
-      <xs:attribute name="EmSize" type="xs:double"/>
-      <xs:attribute name="FontName" type="xs:string"/>
+
+    <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
+    <xs:attribute name="EmSize" type="xs:double"/>
+    <xs:attribute name="FontName" type="xs:string"/>
 
     <xs:attribute name="IsVisible" type="xs:boolean"/>
     <xs:attribute name="IsVisiblePath" type="xs:string"/>
-    
+
   </xs:complexType>
 
   <xs:complexType name="ImageElement">
@@ -133,6 +165,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  
-  
+
+
 </xs:schema>
