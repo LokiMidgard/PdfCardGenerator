@@ -54,7 +54,7 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(textElement),
                                 Position = GetPosition(textElement),
                                 ZIndex = textElement.ZPosition,
-                                Paragraphs = textElement.Paragraph.Select(p =>
+                                Paragraphs = textElement.Items.Select(p =>
                                 {
 
                                     var result = new Paragraph

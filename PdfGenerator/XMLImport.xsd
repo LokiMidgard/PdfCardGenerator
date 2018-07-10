@@ -92,6 +92,7 @@
           <xs:element ref="Paragraph"/>
           <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
         </xs:choice>
+        <xs:attribute name="Select" type="xs:string"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -103,7 +104,7 @@
           <xs:choice maxOccurs="unbounded">
             <xs:element ref="LineBreak"/>
             <xs:element ref="mstns:TextRun"/>
-            <xs:element ref="ForEach" />
+            <xs:element ref="ForEachRun" />
           </xs:choice>
 
           <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
@@ -131,15 +132,16 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="ForEach">
+  <xs:element name="ForEachRun">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="Run">
           <xs:choice maxOccurs="unbounded">
-            <xs:element ref="ForEach" />
+            <xs:element ref="ForEachRun" />
             <xs:element ref="TextRun" />
             <xs:element ref="LineBreak" />
           </xs:choice>
+          <xs:attribute name="Select" type="xs:string"/>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

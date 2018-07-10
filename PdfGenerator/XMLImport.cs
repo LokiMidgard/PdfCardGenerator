@@ -482,6 +482,8 @@ namespace Serilizer {
         
         private AbstractParagraph itemField;
         
+        private string selectField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForeEachParagraph))]
         [System.Xml.Serialization.XmlElementAttribute("Paragraph", typeof(Paragraph))]
@@ -491,6 +493,17 @@ namespace Serilizer {
             }
             set {
                 this.itemField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Select {
+            get {
+                return this.selectField;
+            }
+            set {
+                this.selectField = value;
             }
         }
     }
@@ -533,7 +546,7 @@ namespace Serilizer {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForEach))]
+        [System.Xml.Serialization.XmlElementAttribute("ForEachRun", typeof(ForEachRun))]
         [System.Xml.Serialization.XmlElementAttribute("LineBreak", typeof(LineBreak))]
         [System.Xml.Serialization.XmlElementAttribute("TextRun", typeof(TextRun))]
         public Run[] Items {
@@ -666,12 +679,14 @@ namespace Serilizer {
         "LImport.xsd")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
         "LImport.xsd", IsNullable=false)]
-    public partial class ForEach : Run {
+    public partial class ForEachRun : Run {
         
         private Run[] itemsField;
         
+        private string selectField;
+        
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForEach))]
+        [System.Xml.Serialization.XmlElementAttribute("ForEachRun", typeof(ForEachRun))]
         [System.Xml.Serialization.XmlElementAttribute("LineBreak", typeof(LineBreak))]
         [System.Xml.Serialization.XmlElementAttribute("TextRun", typeof(TextRun))]
         public Run[] Items {
@@ -680,6 +695,17 @@ namespace Serilizer {
             }
             set {
                 this.itemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Select {
+            get {
+                return this.selectField;
+            }
+            set {
+                this.selectField = value;
             }
         }
     }
