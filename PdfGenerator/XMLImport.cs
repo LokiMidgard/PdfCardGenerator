@@ -480,19 +480,19 @@ namespace Serilizer {
         "LImport.xsd")]
     public partial class ForeEachParagraph : AbstractParagraph {
         
-        private AbstractParagraph itemField;
+        private AbstractParagraph[] itemsField;
         
         private string selectField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForeEachParagraph))]
         [System.Xml.Serialization.XmlElementAttribute("Paragraph", typeof(Paragraph))]
-        public AbstractParagraph Item {
+        public AbstractParagraph[] Items {
             get {
-                return this.itemField;
+                return this.itemsField;
             }
             set {
-                this.itemField = value;
+                this.itemsField = value;
             }
         }
         

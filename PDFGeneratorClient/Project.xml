@@ -16,9 +16,9 @@
   <Template Context="//nota:Daten/aktionen:Aktionen/*" Width="63 mm" Height="88 mm" >
     <Text left="9 mm" top="3mm" width="43 mm" height="8mm">
       <Paragraph  Alignment="Center" EmSize="12" FontStyle="Bold">
-        <Run>
+        <TextRun>
           <TextPath>@Name</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
     </Text>
 
@@ -26,133 +26,133 @@
 
     <Text left="3 mm" top="3 mm" width="6 mm" height="8 mm">
       <Paragraph  Alignment="Center" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>@Kosten</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
     </Text>
 
 
     <Text left="3mm" top="70 mm" width="55mm" height="6 mm" >
       <Paragraph FontStyle="Italic" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:Beschreibung</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
     </Text>
     <Text left="3mm" top="76 mm" width="55 mm" height="6.3 mm" >
       <Paragraph FontStyle="Italic" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:Beschreibung</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
     </Text>
 
     <Text left="3 mm" top="11 mm" width="55mm" height="58.1mm" >
       <Paragraph FontStyle="Italic" EmSize="5" IsVisiblePath="./aktionen:Beschreibung">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:Beschreibung</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:Bedingung" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Bedingung</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:Bedingung" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:Bedingung</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:InstantEffektBedingung" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Augenblicklicher Effekt</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:InstantEffekt" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:InstantEffekt</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:GarantierterEffekt" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Garantierter Effekt</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:GarantierterEffekt" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:GarantierterEffekt</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:OffensivErfolg" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Offensiv Erfolg</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:OffensivErfolg" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:OffensivErfolg</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:DefensivErfolg" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Defensiver Erfolg</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:DefensivErfolg" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:DefensivErfolg</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:SekundärErfolg" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Sekundeärer Erfolg</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:SekundärErfolg" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:SekundärErfolg</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:OffensivMiserfolg" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Offensiver Misserfolg</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:OffensivMiserfolg" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:OffensivMiserfolg</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
       <Paragraph IsVisiblePath="./aktionen:DefensivMiserfolg" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Defensiver Misserfolg</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:DefensivMiserfolg" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:DefensivMiserfolg</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
 
       <Paragraph IsVisiblePath="./aktionen:SekundärMiserfolg" BeforeParagraph="4mm" AfterParagraph="2mm" FontStyle="Bold" EmSize="7">
-        <Run>
+        <TextRun>
           <Text>Säkundärer Misserfolg</Text>
-        </Run>
+        </TextRun>
       </Paragraph>
       <Paragraph IsVisiblePath="./aktionen:SekundärMiserfolg" BeforeParagraph="1mm" AfterParagraph="0mm" EmSize="6">
-        <Run>
+        <TextRun>
           <TextPath>./aktionen:SekundärMiserfolg</TextPath>
-        </Run>
+        </TextRun>
       </Paragraph>
 
 

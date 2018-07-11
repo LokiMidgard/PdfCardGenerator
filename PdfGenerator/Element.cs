@@ -25,17 +25,18 @@ namespace PdfGenerator
 
     public class TextElement : Element
     {
-        public IList<Paragraph> Paragraphs { get; set; }
+        public IList<IChild<Paragraph>> Paragraphs { get; set; }
 
     }
 
-    public class Paragraph
+    public class Paragraph : IChild<Paragraph>
     {
-        public IReadOnlyList<Run> Runs { get; }
 
         public const string DEFAULT_FONT_NAME = "Verdana";
         public const double DEFAULT_EM_SIZE = 12.0;
-        private readonly List<Run> runs;
+        private IList<IChild<Run>> _runs;
+
+        public IList<IChild<Run>> Runs { get => _runs ?? (_runs = new List<IChild<Run>>()); set => _runs = value; }
         /// <summary>
         /// Linespace relativ to normal linespacing.
         /// </summary>
@@ -52,43 +53,53 @@ namespace PdfGenerator
 
         public Paragraph()
         {
-            this.runs = new List<Run>();
-            this.Runs = this.runs.AsReadOnly();
         }
 
-        public TextRun AddRun(ContextValue<string>? text = null, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null) => this.InsertRun(this.runs.Count, text, fontStyle, emSize, fontName, isVisible);
+        //public TextRun AddRun(ContextValue<string>? text = null, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null) => this.InsertRun(this.runs.Count, text, fontStyle, emSize, fontName, isVisible);
 
-        public TextRun InsertRun(int index, ContextValue<string>? text = null, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null)
-        {
-            var newRun = new TextRun(this)
-            {
-                EmSize = emSize,
-                FontName = fontName,
-                FontStyle = fontStyle,
-                Text = text ?? default,
-                IsVisible = isVisible ?? true
-            };
-            this.runs.Insert(index, newRun);
-            return newRun;
-        }
+        //public TextRun InsertRun(int index, ContextValue<string>? text = null, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null)
+        //{
+        //    var newRun = new TextRun(this)
+        //    {
+        //        EmSize = emSize,
+        //        FontName = fontName,
+        //        FontStyle = fontStyle,
+        //        Text = text ?? default,
+        //        IsVisible = isVisible ?? true
+        //    };
+        //    this.runs.Insert(index, newRun);
+        //    return newRun;
+        //}
 
-        public LineBreakRun AddLineBreak(ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null) => this.InsertLineBreak(this.runs.Count, fontStyle, emSize, fontName, isVisible);
-        public LineBreakRun InsertLineBreak(int index, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null)
-        {
-            var newRun = new LineBreakRun(this)
-            {
-                EmSize = emSize,
-                FontName = fontName,
-                FontStyle = fontStyle,
-                IsVisible = isVisible ?? true
-            };
-            this.runs.Insert(index, newRun);
-            return newRun;
-        }
+        //public LineBreakRun AddLineBreak(ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null) => this.InsertLineBreak(this.runs.Count, fontStyle, emSize, fontName, isVisible);
+        //public LineBreakRun InsertLineBreak(int index, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null)
+        //{
+        //    var newRun = new LineBreakRun(this)
+        //    {
+        //        EmSize = emSize,
+        //        FontName = fontName,
+        //        FontStyle = fontStyle,
+        //        IsVisible = isVisible ?? true
+        //    };
+        //    this.runs.Insert(index, newRun);
+        //    return newRun;
+        //}
 
+        //public LineBreakRun InsertForeach(int index, ContextValue<XFontStyle>? fontStyle = null, ContextValue<double>? emSize = null, ContextValue<string>? fontName = null, ContextValue<bool>? isVisible = null)
+        //{
+        //    var newRun = new LineBreakRun(this)
+        //    {
+        //        EmSize = emSize,
+        //        FontName = fontName,
+        //        FontStyle = fontStyle,
+        //        IsVisible = isVisible ?? true
+        //    };
+        //    this.runs.Insert(index, newRun);
+        //    return newRun;
+        //}
     }
 
-    public abstract class Run
+    public abstract class Run : IChild<Run>
     {
         private ContextValue<string>? _fontName;
         private ContextValue<double>? _emSize;
@@ -120,13 +131,13 @@ namespace PdfGenerator
     }
     public sealed class LineBreakRun : Run
     {
-        internal LineBreakRun(Paragraph paragraph) : base(paragraph)
+        public LineBreakRun(Paragraph paragraph) : base(paragraph)
         {
         }
     }
     public sealed class TextRun : Run
     {
-        internal TextRun(Paragraph paragraph) : base(paragraph)
+        public TextRun(Paragraph paragraph) : base(paragraph)
         {
         }
 
@@ -153,4 +164,17 @@ namespace PdfGenerator
 
         }
     }
+
+    public interface IChild<T> { }
+
+    public class ForeEach<T> : IChild<T>
+    {
+        public string Select { get; set; }
+
+        public IList<IChild<T>> Childrean { get; set; }
+
+        public ContextValue<bool> IsVisible { get; set; } = true;
+
+    }
+
 }

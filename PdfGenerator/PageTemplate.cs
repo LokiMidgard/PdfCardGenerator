@@ -98,16 +98,17 @@ namespace PdfGenerator
             return document;
         }
 
-        private static void HandleTextElement(IXmlNamespaceResolver resolver, XElement context, XGraphics gfx, TextElement textElement)
+        private static IEnumerable<Paragraph> TransformParapgraps(IChild<Paragraph> p, IXmlNamespaceResolver resolver, XElement context)
         {
-            var position = textElement.Position.GetValue(context, resolver);
-
-            var frame = textElement.Position.GetValue(context, resolver);
-            var startPosition = frame.Location;
-            var currentPosition = startPosition;
-
-            IEnumerable<Paragraph> TransformParapgraps(Paragraph oldP )
+            if (p is ForeEach<Paragraph> forEach)
             {
+                foreach (var newContext in context.XPathSelectElements(forEach.Select))
+                    foreach (var child in forEach.Childrean.SelectMany(x => TransformParapgraps(x, resolver, newContext)))
+                        yield return child;
+            }
+            if (p is Paragraph oldP)
+            {
+
                 var currentP = new Paragraph
                 {
                     AfterParagraph = oldP.AfterParagraph,
@@ -123,7 +124,13 @@ namespace PdfGenerator
                 foreach (var item in oldP.Runs)
                 {
                     if (item is LineBreakRun lineBreak)
-                        currentP.AddLineBreak(lineBreak.FontStyle, lineBreak.EmSize, lineBreak.FontName, lineBreak.IsVisible);
+                        currentP.Runs.Add(new LineBreakRun(currentP)
+                        {
+                            EmSize = lineBreak.EmSize,
+                            FontName = lineBreak.FontName,
+                            FontStyle = lineBreak.FontStyle,
+                            IsVisible = lineBreak.IsVisible
+                        });
 
                     else if (item is TextRun textRun)
                     {
@@ -153,14 +160,35 @@ namespace PdfGenerator
                                     if (lastLinebreaks == 1 && lastSpaces >= 2)
                                     {
                                         // we make a linebreak and write everything already in our buffer
-                                        currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
-                                        currentP.AddLineBreak();
+                                        currentP.Runs.Add(new TextRun(currentP)
+                                        {
+                                            EmSize = textRun.EmSize,
+                                            FontName = textRun.FontName,
+                                            IsVisible = textRun.IsVisible,
+                                            FontStyle = textRun.FontStyle,
+                                            Text = builder.ToString()
+                                        });
+                                        currentP.Runs.Add(new LineBreakRun(currentP)
+                                        {
+                                            EmSize = textRun.EmSize,
+                                            FontName = textRun.FontName,
+                                            IsVisible = textRun.IsVisible,
+                                            FontStyle = textRun.FontStyle
+                                        });
+
                                         builder.Clear();
                                     }
                                     else if (lastLinebreaks > 1)
                                     {
                                         // we make a new paragraph
-                                        currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                                        currentP.Runs.Add(new TextRun(currentP)
+                                        {
+                                            EmSize = textRun.EmSize,
+                                            FontName = textRun.FontName,
+                                            IsVisible = textRun.IsVisible,
+                                            FontStyle = textRun.FontStyle,
+                                            Text = builder.ToString()
+                                        });
                                         yield return currentP;
                                         currentP = new Paragraph()
                                         {
@@ -186,7 +214,14 @@ namespace PdfGenerator
                                 }
                             }
                             if (builder.Length > 0)
-                                currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                                currentP.Runs.Add(new TextRun(currentP)
+                                {
+                                    EmSize = textRun.EmSize,
+                                    FontName = textRun.FontName,
+                                    IsVisible = textRun.IsVisible,
+                                    FontStyle = textRun.FontStyle,
+                                    Text = builder.ToString()
+                                });
                         }
                         else
                         {
@@ -195,8 +230,21 @@ namespace PdfGenerator
                                 if (c == '\n')
                                 {
                                     if (builder.Length > 0)
-                                        currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
-                                    currentP.AddLineBreak();
+                                        currentP.Runs.Add(new TextRun(currentP)
+                                        {
+                                            EmSize = textRun.EmSize,
+                                            FontName = textRun.FontName,
+                                            IsVisible = textRun.IsVisible,
+                                            FontStyle = textRun.FontStyle,
+                                            Text = builder.ToString()
+                                        });
+                                    currentP.Runs.Add(new LineBreakRun(currentP)
+                                    {
+                                        EmSize = textRun.EmSize,
+                                        FontName = textRun.FontName,
+                                        IsVisible = textRun.IsVisible,
+                                        FontStyle = textRun.FontStyle,
+                                    });
                                     builder.Clear();
                                 }
                                 else if (c == '\r')
@@ -209,7 +257,14 @@ namespace PdfGenerator
                                 }
                             }
                             if (builder.Length > 0)
-                                currentP.AddRun(builder.ToString(), textRun.FontStyle, textRun.EmSize, textRun.FontName, textRun.IsVisible);
+                                currentP.Runs.Add(new TextRun(currentP)
+                                {
+                                    EmSize = textRun.EmSize,
+                                    FontName = textRun.FontName,
+                                    IsVisible = textRun.IsVisible,
+                                    FontStyle = textRun.FontStyle,
+                                    Text = builder.ToString()
+                                });
 
                         }
 
@@ -219,8 +274,19 @@ namespace PdfGenerator
 
                 yield return currentP;
             }
+        }
 
-            var paragraphs = textElement.Paragraphs.SelectMany(TransformParapgraps);
+
+        private static void HandleTextElement(IXmlNamespaceResolver resolver, XElement context, XGraphics gfx, TextElement textElement)
+        {
+            var position = textElement.Position.GetValue(context, resolver);
+
+            var frame = textElement.Position.GetValue(context, resolver);
+            var startPosition = frame.Location;
+            var currentPosition = startPosition;
+
+
+            var paragraphs = textElement.Paragraphs.SelectMany(x => TransformParapgraps(x, resolver, context));
             foreach (var paragraph in paragraphs)
             {
                 if (!paragraph.IsVisible.GetValue(context, resolver))
@@ -229,72 +295,13 @@ namespace PdfGenerator
                 var lines = new List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>>();
                 var currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>();
                 currentPosition = new XPoint(currentPosition.X, currentPosition.Y + paragraph.BeforeParagraph.GetValue(context, resolver));
+
+
                 foreach (var run in paragraph.Runs)
-                {
-                    if (!run.IsVisible.GetValue(context, resolver))
-                        continue;
-
-                    lines.Add(currentLine);
-
-                    var font = new XFont(run.FontName.Value.GetValue(context, resolver), run.EmSize.Value.GetValue(context, resolver), run.FontStyle.Value.GetValue(context, resolver));
-                    var height = font.Height * paragraph.Linespacing.GetValue(context, resolver);
-
-                    if (run is LineBreakRun)
-                    {
-                        currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
-                    }
-                    else if (run is TextRun textRun)
-                    {
-
-
-                        var textForRun = textRun.Text.GetValue(context, resolver);
-                        if (string.IsNullOrEmpty(textForRun))
-                            continue;
-
-                        var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
-                        var spaceSize = gfx.MeasureString(" ", font);
-
-                        int wordsToPrint;
-                        for (int i = 0; i < wordSizes.Length; i += wordsToPrint)
-                        {
-                            double lineWidth = 0;
-                            bool endOfLine = false;
-                            for (wordsToPrint = 0; wordsToPrint + i < wordSizes.Length; wordsToPrint++)
-                            {
-                                var w = wordSizes[i + wordsToPrint];
-
-                                if (w.Size.Width + currentPosition.X + lineWidth > position.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
-                                {
-                                    // we are over the bounding. set current Position to next line
-                                    endOfLine = true;
-                                    break;
-                                }
-                                lineWidth += w.Size.Width + (wordsToPrint == 0 ? 0 : spaceSize.Width);
-                            }
-                            wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
-
-                            var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
-
-                            currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, font)));
-                            currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
-
-                            if (endOfLine)
-                            {
-                                currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
-                                currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint currentPosition, XLineAlignment alignment, XSize size)>();
-                                lines.Add(currentLine);
-                            }
-
-                            if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.Size.Height) + currentPosition.Y > position.Bottom)
-                                goto END; // reached end of box
-
-
-                        }
-                    }
-                }
+                    if (!ExpandRuns(run, paragraph, gfx, position, startPosition, ref currentPosition, lines, currentLine, resolver, context))
+                        break;
 
                 // now we calculate LineAlignment and print 
-                END:;
                 var maximumWidth = textElement.Position.GetValue(context, resolver).Width;
                 foreach (var line in lines.Where(x => x.Count > 0))
                 {
@@ -327,6 +334,87 @@ namespace PdfGenerator
             }
 
         }
+
+        private static bool ExpandRuns(IChild<Run> child, Paragraph paragraph, XGraphics gfx, XRect frame, XPoint startPosition, ref XPoint currentPosition, List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>> lines, List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)> currentLine, IXmlNamespaceResolver resolver, XElement context)
+        {
+            if (child is ForeEach<Run> forEach)
+            {
+                foreach (var newContext in context.XPathSelectElements(forEach.Select, resolver))
+                    foreach (var newChild in forEach.Childrean)
+                        if (!ExpandRuns(newChild, paragraph, gfx, frame, startPosition, ref currentPosition, lines, currentLine, resolver, newContext))
+                            return false;
+                return true;
+            }
+            else if (child is Run run)
+            {
+
+                if (!run.IsVisible.GetValue(context, resolver))
+                    return true;
+
+                lines.Add(currentLine);
+
+                var font = new XFont(run.FontName.Value.GetValue(context, resolver), run.EmSize.Value.GetValue(context, resolver), run.FontStyle.Value.GetValue(context, resolver));
+                var height = font.Height * paragraph.Linespacing.GetValue(context, resolver);
+
+                if (run is LineBreakRun)
+                {
+                    currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
+                }
+                else if (run is TextRun textRun)
+                {
+
+
+                    var textForRun = textRun.Text.GetValue(context, resolver);
+                    if (string.IsNullOrEmpty(textForRun))
+                        return true;
+
+                    var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
+                    var spaceSize = gfx.MeasureString(" ", font);
+
+                    int wordsToPrint;
+                    for (int i = 0; i < wordSizes.Length; i += wordsToPrint)
+                    {
+                        double lineWidth = 0;
+                        bool endOfLine = false;
+                        for (wordsToPrint = 0; wordsToPrint + i < wordSizes.Length; wordsToPrint++)
+                        {
+                            var w = wordSizes[i + wordsToPrint];
+
+                            if (w.Size.Width + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                            {
+                                // we are over the bounding. set current Position to next line
+                                endOfLine = true;
+                                break;
+                            }
+                            lineWidth += w.Size.Width + (wordsToPrint == 0 ? 0 : spaceSize.Width);
+                        }
+                        wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
+
+                        var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
+
+                        currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, font)));
+                        currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
+
+                        if (endOfLine)
+                        {
+                            currentPosition = new XPoint(startPosition.X, currentPosition.Y + height);
+                            currentLine = new List<(string textToPrint, XFont font, XBrush brush, XPoint currentPosition, XLineAlignment alignment, XSize size)>();
+                            lines.Add(currentLine);
+                        }
+
+                        if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.Size.Height) + currentPosition.Y > frame.Bottom)
+                            return false; // reached end of box
+
+
+                    }
+                }
+                return true;
+            }
+            else
+                throw new NotSupportedException();
+        }
+
+
     }
 
 

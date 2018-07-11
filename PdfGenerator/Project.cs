@@ -30,6 +30,79 @@ namespace PdfGenerator
         public static Project Load(System.IO.Stream stream, DirectoryInfo workingDirectory)
         {
 
+            IChild<Paragraph> GetParagraps(Serilizer.ForeEachParagraph p)
+            {
+                return new ForeEach<Paragraph>()
+                {
+                    IsVisible = GetVisible(p),
+                    Select = p.Select,
+                    Childrean = p.Items.Select(x =>
+                    {
+                        if (x is Serilizer.ForeEachParagraph newForEach)
+                            return GetParagraps(newForEach);
+                        else if (x is Serilizer.Paragraph newP)
+                            return GetParagrap(newP);
+                        else
+                            throw new NotSupportedException();
+                    }).ToArray()
+                };
+
+            }
+
+            IChild<Paragraph> GetParagrap(Serilizer.Paragraph p)
+            {
+                var result = new Paragraph
+                {
+                    AfterParagraph = (XUnit)(p.AfterParagraph ?? XUnit.Zero),
+                    BeforeParagraph = (XUnit)(p.BeforeParagraph ?? XUnit.Zero),
+                    Alignment = p.AlignmentSpecified ? TransformAlignment(p.Alignment) : XLineAlignment.Near,
+                    EmSize = p.EmSizeSpecified ? p.EmSize : Paragraph.DEFAULT_EM_SIZE,
+                    IsVisible = GetVisible(p),
+                    Linespacing = p.Linespacing,
+                    FontName = p.FontName ?? Paragraph.DEFAULT_FONT_NAME,
+                    FontStyle = TransformFontStyle(p.FontStyle)
+                };
+
+                IChild<Run> GetRun(Serilizer.Run run)
+                {
+                    if (run is LineBreak lineBreak)
+                    {
+                        return new LineBreakRun(result)
+                        {
+
+                            FontStyle = lineBreak.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(lineBreak.FontStyle)) : null,
+                            EmSize = lineBreak.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(lineBreak.EmSize) : null,
+                            FontName = lineBreak.FontName,
+                            IsVisible = GetVisible(lineBreak)
+                        };
+                    }
+                    else if (run is Serilizer.TextRun textRun)
+                    {
+                        return new TextRun(result)
+                        {
+                            FontStyle = textRun.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(textRun.FontStyle)) : null,
+                            EmSize = textRun.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(textRun.EmSize) : null,
+                            FontName = textRun.FontName,
+                            IsVisible = GetVisible(textRun),
+                            Text = textRun.ItemElementName == ItemChoiceType.Text ? textRun.Item : ContextValue<string>.FromXPath(textRun.Item)
+                        };
+                    }
+                    else if (run is Serilizer.ForEachRun forEach)
+                    {
+                        return new ForeEach<Run>()
+                        {
+                            IsVisible = GetVisible(forEach),
+                            Select = forEach.Select,
+                            Childrean = forEach.Items.Select(GetRun).ToArray()
+                        };
+                    }
+                    else
+                        throw new NotSupportedException($"THe type {run?.GetType()} is not supported");
+                }
+                result.Runs = p.Items.Select(GetRun).ToArray();
+                return result;
+            }
+
             var doc = XDocument.Load(stream);
 
             Serilizer.Project deserilisation;
@@ -41,7 +114,7 @@ namespace PdfGenerator
             {
                 return new PageTemplate
                 {
-                    XSLT = original.Xslt != null ? (RelativePath?)(new RelativePath() { Path = original.Xslt, WorkingDirectory = workingDirectory } ): null,
+                    XSLT = original.Xslt != null ? (RelativePath?)(new RelativePath() { Path = original.Xslt, WorkingDirectory = workingDirectory }) : null,
                     ContextPath = (XPath)original.Context,
                     Height = original.Height,
                     Width = original.Width,
@@ -54,50 +127,16 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(textElement),
                                 Position = GetPosition(textElement),
                                 ZIndex = textElement.ZPosition,
-                                Paragraphs = textElement.Items.Select(p =>
+                                Paragraphs = textElement.Items.Select(child =>
                                 {
-
-                                    var result = new Paragraph
-                                    {
-                                        AfterParagraph = (XUnit)(p.AfterParagraph ?? XUnit.Zero),
-                                        BeforeParagraph = (XUnit)(p.BeforeParagraph ?? XUnit.Zero),
-                                        Alignment = p.AlignmentSpecified ? TransformAlignment(p.Alignment) : XLineAlignment.Near,
-                                        EmSize = p.EmSizeSpecified ? p.EmSize : Paragraph.DEFAULT_EM_SIZE,
-                                        IsVisible = GetVisible(p),
-                                        Linespacing = p.Linespacing,
-                                        FontName = p.FontName ?? Paragraph.DEFAULT_FONT_NAME,
-                                        FontStyle = TransformFontStyle(p.FontStyle)
-                                    };
-
-                                    foreach (var run in p.Items)
-                                    {
-                                        if (run is LineBreak lineBreak)
-                                        {
-                                            result.AddLineBreak(
-                                                fontStyle: lineBreak.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(lineBreak.FontStyle)) : null,
-                                                emSize: lineBreak.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(lineBreak.EmSize) : null,
-                                                fontName: lineBreak.FontName,
-                                                isVisible: GetVisible(lineBreak));
-                                        }
-                                        else if (run is Serilizer.TextRun textRun)
-                                        {
-                                            result.AddRun(
-                                                fontStyle: textRun.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(textRun.FontStyle)) : null,
-                                                emSize: textRun.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(textRun.EmSize) : null,
-                                                fontName: textRun.FontName,
-                                                isVisible: GetVisible(textRun),
-                                                text: textRun.ItemElementName == ItemChoiceType.Text ? textRun.Item : ContextValue<string>.FromXPath(textRun.Item));
-                                        }
-                                    }
-
-                                    return result;
-
+                                    if (child is ForeEachParagraph foreEach)
+                                        return GetParagraps(foreEach);
+                                    else if (child is Serilizer.Paragraph p)
+                                        return GetParagrap(p);
+                                    else
+                                        throw new NotImplementedException($"Type {child?.GetType()} is not supporteted");
                                 }).ToArray()
                             };
-
-
-
-
                         }
                         else if (x is Serilizer.ImageElement imageElement)
                         {
