@@ -40,6 +40,25 @@
         </TextRun>
       </Paragraph>
     </Text>
+
+    <Rect left="3mm" top="70 mm" width="55mm" height="6 mm" >
+      <Border Color="Yellow"/>
+      <Fill>
+        <GradientFill Color1="#00FF0000" Color2="Blue">
+          <Point X="0" Y="0"/>
+          <Point X="1" Y="0"/>
+        </GradientFill>
+      </Fill>
+    </Rect>
+    <Rect left="3mm" top="70 mm" width="55mm" height="6 mm" >
+      <Border Color="Red"/>
+      <Fill>
+        <SolidFill Color="Green" />
+      </Fill>
+    </Rect>
+
+
+
     <Text left="3mm" top="76 mm" width="55 mm" height="6.3 mm" >
       <Paragraph FontStyle="Italic" EmSize="6">
         <TextRun>

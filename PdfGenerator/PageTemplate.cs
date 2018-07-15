@@ -60,7 +60,7 @@ namespace PdfGenerator
                 {
                     // Create a font
 
-                    foreach (var item in this.Elements.OrderByDescending(x => x.ZIndex.GetValue(context, resolver)))
+                    foreach (var item in this.Elements.Reverse().OrderByDescending(x => x.ZIndex.GetValue(context, resolver)))
                     {
                         if (!item.IsVisible.GetValue(context, resolver))
                             continue;
@@ -68,23 +68,23 @@ namespace PdfGenerator
                         if (item is TextElement textElement)
                         {
                             HandleTextElement(resolver, context, gfx, textElement);
-
-
-
-                            //gfx.MeasureString(,, XStringFormats.BottomRight)
                         }
                         else if (item is ImageElement imageElement)
                         {
                             var path = imageElement.ImagePath.GetValue(context, resolver);
                             var position = imageElement.Position.GetValue(context, resolver);
+
                             using (var image = XImage.FromFile(path))
                                 gfx.DrawImage(image, position);
+                        }
+                        else if (item is RectElement rectElement)
+                        {
+                            var position = rectElement.Position.GetValue(context, resolver);
 
+                            gfx.DrawRectangle(rectElement.BorderColor, rectElement.FillColor, rectElement.Position.GetValue(context, resolver));
                         }
                         else
                             throw new NotSupportedException($"Element of Type {item?.GetType()} is not supported.");
-
-
                     }
 
                     //// Draw the text

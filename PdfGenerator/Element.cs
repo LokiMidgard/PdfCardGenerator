@@ -23,6 +23,12 @@ namespace PdfGenerator
         }
     }
 
+    public class RectElement : Element
+    {
+        public XPen BorderColor { get; set; }
+        public XBrush FillColor { get; set; }
+
+    }
     public class TextElement : Element
     {
         public IList<IChild<Paragraph>> Paragraphs { get; set; }

@@ -61,6 +61,7 @@ namespace Serilizer {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Image", typeof(ImageElement))]
+        [System.Xml.Serialization.XmlElementAttribute("Rect", typeof(RectElement))]
         [System.Xml.Serialization.XmlElementAttribute("Text", typeof(TextElement))]
         public BaseElement[] Items {
             get {
@@ -154,6 +155,7 @@ namespace Serilizer {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ImageElement))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RectElement))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(TextElement))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
@@ -279,6 +281,16 @@ namespace Serilizer {
                 this.zPositionFieldSpecified = value;
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class Fill {
     }
     
     /// <remarks/>
@@ -791,6 +803,217 @@ namespace Serilizer {
         
         /// <remarks/>
         Far,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class RectElement : BaseElement {
+        
+        private RectElementBorder borderField;
+        
+        private RectElementFill fillField;
+        
+        /// <remarks/>
+        public RectElementBorder Border {
+            get {
+                return this.borderField;
+            }
+            set {
+                this.borderField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public RectElementFill Fill {
+            get {
+                return this.fillField;
+            }
+            set {
+                this.fillField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class RectElementBorder {
+        
+        private string colorField;
+        
+        private double thiknessField;
+        
+        public RectElementBorder() {
+            this.thiknessField = 1D;
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Color {
+            get {
+                return this.colorField;
+            }
+            set {
+                this.colorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(1D)]
+        public double Thikness {
+            get {
+                return this.thiknessField;
+            }
+            set {
+                this.thiknessField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class RectElementFill {
+        
+        private Fill itemField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("GradientFill", typeof(GradientFill))]
+        [System.Xml.Serialization.XmlElementAttribute("SolidFill", typeof(SolidFill))]
+        public Fill Item {
+            get {
+                return this.itemField;
+            }
+            set {
+                this.itemField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
+    public partial class GradientFill : Fill {
+        
+        private GradientFillPoint[] pointField;
+        
+        private string color1Field;
+        
+        private string color2Field;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Point")]
+        public GradientFillPoint[] Point {
+            get {
+                return this.pointField;
+            }
+            set {
+                this.pointField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Color1 {
+            get {
+                return this.color1Field;
+            }
+            set {
+                this.color1Field = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Color2 {
+            get {
+                return this.color2Field;
+            }
+            set {
+                this.color2Field = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class GradientFillPoint {
+        
+        private double xField;
+        
+        private double yField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public double X {
+            get {
+                return this.xField;
+            }
+            set {
+                this.xField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public double Y {
+            get {
+                return this.yField;
+            }
+            set {
+                this.yField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
+    public partial class SolidFill : Fill {
+        
+        private string colorField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Color {
+            get {
+                return this.colorField;
+            }
+            set {
+                this.colorField = value;
+            }
+        }
     }
     
     /// <remarks/>

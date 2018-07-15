@@ -162,6 +162,62 @@ namespace PdfGenerator
 
                             return result;
                         }
+                        else if (x is Serilizer.RectElement rectElement)
+                        {
+                            var frame = GetPosition(rectElement);
+                            XBrush brush;
+                            XPen pen;
+
+                            if (rectElement.Fill == null)
+                            {
+                                brush = null;
+                            }
+                            else
+                            {
+                                if (rectElement.Fill.Item is Serilizer.SolidFill solid)
+                                {
+                                    var color = GetColorFromString(solid.Color);
+
+                                    brush = new XSolidBrush(color);
+                                }
+                                else if (rectElement.Fill.Item is Serilizer.GradientFill gradiant)
+                                {
+                                    var color1 = GetColorFromString(gradiant.Color1);
+                                    var color2 = GetColorFromString(gradiant.Color2);
+
+                                    var point1 = new XPoint(frame.Left + gradiant.Point[0].X * frame.Width, frame.Top + gradiant.Point[0].Y * frame.Height);
+                                    var point2 = new XPoint(frame.Left + gradiant.Point[1].X * frame.Width, frame.Top + gradiant.Point[1].Y * frame.Height);
+
+                                    brush = new XLinearGradientBrush(point1, point2, color1, color2);
+                                    //brush = new XLinearGradientBrush(frame, color1, color2, XLinearGradientMode.Vertical);
+
+                                }
+                                else throw new NotSupportedException($"The Type {rectElement.Fill.Item} is not Supported.");
+                            }
+
+                            if (rectElement.Border == null)
+                            {
+                                pen = null;
+                            }
+                            else
+                            {
+                                var color = GetColorFromString(rectElement.Border.Color);
+                                pen = new XPen(color);
+                            }
+                            var result = new RectElement
+                            {
+                                IsVisible = GetVisible(rectElement),
+                                Position = frame,
+                                ZIndex = rectElement.ZPosition,
+                                FillColor = brush,
+                                BorderColor = pen
+
+                            };
+
+
+
+                            return result;
+                        }
                         else
                             throw new NotSupportedException();
                     }).ToArray()
@@ -173,6 +229,25 @@ namespace PdfGenerator
                 Templates = templates,
                 Document = doc
             };
+        }
+
+        private static XColor GetColorFromString(string colorString)
+        {
+            if (colorString == null)
+                throw new ArgumentNullException(nameof(colorString));
+            if (colorString.StartsWith("#"))
+            {
+
+                var a = int.Parse(colorString.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                var r = int.Parse(colorString.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                var g = int.Parse(colorString.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                var b = int.Parse(colorString.Substring(7, 2), System.Globalization.NumberStyles.HexNumber);
+                return XColor.FromArgb(a, r, g, b);
+            }
+            else
+            {
+                return XColor.FromName(colorString);
+            }
         }
 
         public PdfDocument GetDocuments(XDocument xml)
