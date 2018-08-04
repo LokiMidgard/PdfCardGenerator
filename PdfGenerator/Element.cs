@@ -15,6 +15,10 @@ namespace PdfGenerator
 
         public ContextValue<double> ZIndex { get; set; }
 
+        public ContextValue<double> Rotation { get; set; }
+
+        public ContextValue<XPoint> RotationOrigin { get; set; }
+
         public ContextValue<bool> IsVisible { get; set; } = true;
 
 

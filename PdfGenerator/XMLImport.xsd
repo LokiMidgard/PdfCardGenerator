@@ -55,15 +55,19 @@
 
   <xs:complexType name="BaseElement" abstract="true">
 
-    <xs:attribute name="left" type="mstns:Unit"/>
-    <xs:attribute name="top" type="mstns:Unit"/>
-    <xs:attribute name="width" type="mstns:Unit"/>
-    <xs:attribute name="height" type="mstns:Unit"/>
+    <xs:attribute name="left" type="mstns:Unit" use="required"/>
+    <xs:attribute name="top" type="mstns:Unit" use="required"/>
+    <xs:attribute name="width" type="mstns:Unit" use="required"/>
+    <xs:attribute name="height" type="mstns:Unit" use="required"/>
 
-    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="rotation" type="xs:float" default="0"/>
+    <xs:attribute name="rotationOriginX" type="xs:float" default="0"/>
+    <xs:attribute name="rotationOriginY" type="xs:float" default="0"/>
+
+    <xs:attribute name="IsVisible" type="xs:boolean" default="true"/>
     <xs:attribute name="IsVisiblePath" type="xs:string"/>
 
-    <xs:attribute name="ZPosition" type="xs:double"/>
+    <xs:attribute name="ZPosition" type="xs:double" default="0"/>
 
 
   </xs:complexType>
@@ -260,7 +264,7 @@
   </xs:simpleType>
 
   <xs:complexType name="AbstractParagraph" abstract="true">
-    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="IsVisible" type="xs:boolean" default="true"/>
     <xs:attribute name="IsVisiblePath" type="xs:string"/>
   </xs:complexType>
 
@@ -377,7 +381,7 @@
     <xs:attribute name="EmSize" type="xs:double"/>
     <xs:attribute name="FontName" type="xs:string"/>
 
-    <xs:attribute name="IsVisible" type="xs:boolean"/>
+    <xs:attribute name="IsVisible" type="xs:boolean" default="true"/>
     <xs:attribute name="IsVisiblePath" type="xs:string"/>
 
   </xs:complexType>

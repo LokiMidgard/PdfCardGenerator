@@ -126,6 +126,8 @@ namespace PdfGenerator
                             {
                                 IsVisible = GetVisible(textElement),
                                 Position = GetPosition(textElement),
+                                Rotation =textElement.rotation,
+                                RotationOrigin= new XPoint(textElement.rotationOriginX,textElement.rotationOriginY),
                                 ZIndex = textElement.ZPosition,
                                 Paragraphs = textElement.Items.Select(child =>
                                 {
@@ -145,6 +147,8 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(imageElement),
                                 Position = GetPosition(imageElement),
                                 ZIndex = imageElement.ZPosition,
+                                Rotation =imageElement.rotation,
+                                RotationOrigin= new XPoint(imageElement.rotationOriginX,imageElement.rotationOriginY),
                                 ImagePath = new RelativePath()
                                 {
                                     Path = GetImageLocation(),
@@ -209,6 +213,8 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(rectElement),
                                 Position = frame,
                                 ZIndex = rectElement.ZPosition,
+                                Rotation =rectElement.rotation,
+                                RotationOrigin= new XPoint(rectElement.rotationOriginX,rectElement.rotationOriginY),
                                 FillColor = brush,
                                 BorderColor = pen
 
@@ -323,7 +329,7 @@ namespace PdfGenerator
             if (imageElement.IsVisiblePath != null)
                 return new XPath(imageElement.IsVisiblePath);
             else
-                return imageElement.IsVisibleSpecified ? imageElement.IsVisible : true;
+                return imageElement.IsVisible ;
         }
     }
 }

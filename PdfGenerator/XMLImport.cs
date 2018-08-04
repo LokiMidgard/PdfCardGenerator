@@ -173,15 +173,25 @@ namespace Serilizer {
         
         private string heightField;
         
-        private bool isVisibleField;
+        private float rotationField;
         
-        private bool isVisibleFieldSpecified;
+        private float rotationOriginXField;
+        
+        private float rotationOriginYField;
+        
+        private bool isVisibleField;
         
         private string isVisiblePathField;
         
         private double zPositionField;
         
-        private bool zPositionFieldSpecified;
+        public BaseElement() {
+            this.rotationField = ((float)(0F));
+            this.rotationOriginXField = ((float)(0F));
+            this.rotationOriginYField = ((float)(0F));
+            this.isVisibleField = true;
+            this.zPositionField = 0D;
+        }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -229,23 +239,49 @@ namespace Serilizer {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(typeof(float), "0")]
+        public float rotation {
+            get {
+                return this.rotationField;
+            }
+            set {
+                this.rotationField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(typeof(float), "0")]
+        public float rotationOriginX {
+            get {
+                return this.rotationOriginXField;
+            }
+            set {
+                this.rotationOriginXField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(typeof(float), "0")]
+        public float rotationOriginY {
+            get {
+                return this.rotationOriginYField;
+            }
+            set {
+                this.rotationOriginYField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(true)]
         public bool IsVisible {
             get {
                 return this.isVisibleField;
             }
             set {
                 this.isVisibleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool IsVisibleSpecified {
-            get {
-                return this.isVisibleFieldSpecified;
-            }
-            set {
-                this.isVisibleFieldSpecified = value;
             }
         }
         
@@ -262,23 +298,13 @@ namespace Serilizer {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(0D)]
         public double ZPosition {
             get {
                 return this.zPositionField;
             }
             set {
                 this.zPositionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool ZPositionSpecified {
-            get {
-                return this.zPositionFieldSpecified;
-            }
-            set {
-                this.zPositionFieldSpecified = value;
             }
         }
     }
@@ -314,9 +340,11 @@ namespace Serilizer {
         
         private bool isVisibleField;
         
-        private bool isVisibleFieldSpecified;
-        
         private string isVisiblePathField;
+        
+        public Run() {
+            this.isVisibleField = true;
+        }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -375,23 +403,13 @@ namespace Serilizer {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(true)]
         public bool IsVisible {
             get {
                 return this.isVisibleField;
             }
             set {
                 this.isVisibleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool IsVisibleSpecified {
-            get {
-                return this.isVisibleFieldSpecified;
-            }
-            set {
-                this.isVisibleFieldSpecified = value;
             }
         }
         
@@ -445,29 +463,21 @@ namespace Serilizer {
         
         private bool isVisibleField;
         
-        private bool isVisibleFieldSpecified;
-        
         private string isVisiblePathField;
+        
+        public AbstractParagraph() {
+            this.isVisibleField = true;
+        }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(true)]
         public bool IsVisible {
             get {
                 return this.isVisibleField;
             }
             set {
                 this.isVisibleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool IsVisibleSpecified {
-            get {
-                return this.isVisibleFieldSpecified;
-            }
-            set {
-                this.isVisibleFieldSpecified = value;
             }
         }
         

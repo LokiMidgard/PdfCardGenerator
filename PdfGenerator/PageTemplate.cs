@@ -1,4 +1,5 @@
-﻿using PdfSharp.Drawing;
+﻿using PdfCardGenerator;
+using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
@@ -60,28 +61,39 @@ namespace PdfGenerator
                 {
                     // Create a font
 
-                    foreach (var item in this.Elements.Reverse().OrderByDescending(x => x.ZIndex.GetValue(context, resolver)))
+                    foreach (var item in this.Elements.Reverse().OrderBy(x => x.ZIndex.GetValue(context, resolver)))
                     {
                         if (!item.IsVisible.GetValue(context, resolver))
                             continue;
 
                         if (item is TextElement textElement)
                         {
-                            HandleTextElement(resolver, context, gfx, textElement);
+                            var beforeTransform = gfx.Save();
+
+
+                            using (gfx.RotateTransform(textElement, context, resolver))
+                                HandleTextElement(resolver, context, gfx, textElement);
                         }
                         else if (item is ImageElement imageElement)
                         {
                             var path = imageElement.ImagePath.GetValue(context, resolver);
                             var position = imageElement.Position.GetValue(context, resolver);
 
+                            var beforeTransform = gfx.Save();
+                            gfx.RotateAtTransform(imageElement.Rotation.GetValue(context, resolver), imageElement.RotationOrigin.GetValue(context, resolver));
+
                             using (var image = XImage.FromFile(path))
                                 gfx.DrawImage(image, position);
+                            gfx.Restore(beforeTransform);
                         }
                         else if (item is RectElement rectElement)
                         {
                             var position = rectElement.Position.GetValue(context, resolver);
-
+                            var beforeTransform = gfx.Save();
+                            gfx.RotateAtTransform(rectElement.Rotation.GetValue(context, resolver), rectElement.RotationOrigin.GetValue(context, resolver));
                             gfx.DrawRectangle(rectElement.BorderColor, rectElement.FillColor, rectElement.Position.GetValue(context, resolver));
+                            gfx.Restore(beforeTransform);
+
                         }
                         else
                             throw new NotSupportedException($"Element of Type {item?.GetType()} is not supported.");

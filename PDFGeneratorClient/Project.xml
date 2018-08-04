@@ -22,7 +22,7 @@
       </Paragraph>
     </Text>
 
-    <Image left="52 mm" top="3 mm" width="6 mm" height="8 mm" ImageLocation="Flamme.png" IsVisible="true" />
+    <Image left="52 mm" top="3 mm" width="8 mm" height="8 mm" ImageLocation="Actions.pdf#2" IsVisible="true" />
 
     <Text left="3 mm" top="3 mm" width="6 mm" height="8 mm">
       <Paragraph  Alignment="Center" EmSize="6">
