@@ -6,6 +6,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\deDE.hyp.txt" />
+    <None Remove="Resources\deDE.pat.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\deDE.hyp.txt" />
+    <EmbeddedResource Include="Resources\deDE.pat.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NHyphenator" Version="1.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MigraDoc\PDFsharp\src\PdfSharp\PdfSharp.csproj" />
   </ItemGroup>
 

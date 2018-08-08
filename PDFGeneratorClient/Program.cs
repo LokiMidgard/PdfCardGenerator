@@ -1,5 +1,8 @@
 ﻿using Fclp;
+using PdfSharp.Drawing;
+using PdfSharp.Fonts;
 using System;
+using System.IO;
 using System.Xml.Linq;
 
 namespace PDFGenerator.Client
@@ -17,7 +20,7 @@ namespace PDFGenerator.Client
 
         static void Main(string[] args)
         {
-
+            //PdfSharp.Fonts.GlobalFontSettings.FontResolver = new FontResolver();
             var p = new FluentCommandLineParser<ApplicationArguments>();
 
             p.Setup(arg => arg.ProjectPath)
@@ -66,5 +69,6 @@ namespace PDFGenerator.Client
                 }
             }
         }
-    }
+
+     }
 }

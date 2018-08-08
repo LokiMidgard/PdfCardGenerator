@@ -10,23 +10,88 @@
   <xs:element name="Project">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="Template" maxOccurs="unbounded">
+        <xs:element name="Fonts">
           <xs:complexType>
-            <xs:choice maxOccurs="unbounded">
-              <xs:element name="Image" type="mstns:ImageElement" />
-              <xs:element name="Text" type="mstns:TextElement" />
-              <xs:element name="Rect" type="mstns:RectElement" />
+            <xs:sequence>
+              <xs:element name="Font" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="Regular" type="FontLocation" />
+                    <xs:element name="Italic" type="FontLocation" minOccurs="0"/>
+                    <xs:element name="Bold" type="FontLocation" minOccurs="0" />
+                    <xs:element name="BoldItalic" type="FontLocation" minOccurs="0" />
+                  </xs:all>
+                  <xs:attribute name="FamilyName" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="UseSystemFallback" type="xs:boolean" default="true"/>
+            <xs:attribute name="DefaultFont" type="xs:string" default="Verdana"/>
+          </xs:complexType>
+          <xs:unique name="FontUniqness">
+            <xs:selector xpath="mstns:Font"/>
+            <xs:field xpath="@FamilyName"/>
+          </xs:unique>
+        </xs:element>
+        <xs:element name="FallbackFonts">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Font" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="FamilyName" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="NotFoundCharacter" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="FamilyName" type="xs:string" use="required"/>
+                  <xs:attribute name="SubstituteCharacter" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:unique name="FontUniqness2">
+            <xs:selector xpath="mstns:Font"/>
+            <xs:field xpath="@FamilyName"/>
+          </xs:unique>
+        </xs:element>
+        <xs:element name="Templates">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Template" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:choice maxOccurs="unbounded">
+                    <xs:element name="Image" type="mstns:ImageElement" />
+                    <xs:element name="Text" type="mstns:TextElement" />
+                    <xs:element name="Rect" type="mstns:RectElement" />
 
-            </xs:choice>
-            <xs:attribute name="Context" type="xs:string" use="required"/>
-            <xs:attribute name="Width" type="mstns:Unit" use="required"/>
-            <xs:attribute name="Height" type="mstns:Unit" use="required"/>
-            <xs:attribute name="Xslt" type="xs:string" use="optional"/>
+                  </xs:choice>
+                  <xs:attribute name="Context" type="xs:string" use="required"/>
+                  <xs:attribute name="Width" type="mstns:Unit" use="required"/>
+                  <xs:attribute name="Height" type="mstns:Unit" use="required"/>
+                  <xs:attribute name="Xslt" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
+      <xs:attribute name="DefaultLanguage" type="Language" use="required"/>
     </xs:complexType>
+    <xs:key name="FontPK">
+      <xs:selector xpath="mstns:Fonts/mstns:Font"/>
+      <xs:field xpath="@FamilyName"/>
+    </xs:key>
+    <xs:keyref name="FontFK" refer="mstns:FontPK">
+      <xs:selector xpath="mstns:FallbackFonts/mstns:Font"/>
+      <xs:field xpath="@FamilyName"/>
+    </xs:keyref>
   </xs:element>
+
+
+  <xs:complexType name="FontLocation">
+    <xs:attribute name="Path" type="xs:string" use="required"/>
+  </xs:complexType>
+
 
   <xs:simpleType name="FontStyle">
     <xs:restriction base="xs:string">
@@ -268,6 +333,16 @@
     <xs:attribute name="IsVisiblePath" type="xs:string"/>
   </xs:complexType>
 
+
+  <xs:simpleType name="Language">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="de-DE"/>
+      <xs:enumeration value="en-US"/>
+      <xs:enumeration value="en-GB"/>
+      <xs:enumeration value="ru-RU"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:complexType name="Fill">
   </xs:complexType>
 
@@ -307,7 +382,7 @@
           <xs:element ref="Paragraph"/>
           <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
         </xs:choice>
-        <xs:attribute name="Select" type="xs:string"/>
+        <xs:attribute name="Select" type="xs:string" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -322,14 +397,17 @@
             <xs:element ref="ForEachRun" />
           </xs:choice>
 
-          <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
-          <xs:attribute name="EmSize" type="xs:double"/>
+          <xs:attribute name="FontStyle" type="mstns:FontStyle" default="Regular"/>
+          <xs:attribute name="EmSize" type="xs:double" default="12"/>
           <xs:attribute name="FontName" type="xs:string"/>
 
+          <xs:attribute name="Color" type="color" default="Black"/>
+          <xs:attribute name="Language" type="Language"/>
+
           <xs:attribute name="Linespacing" default="1" type="xs:double"/>
-          <xs:attribute name="BeforeParagraph" type="mstns:Unit"/>
-          <xs:attribute name="AfterParagraph" type="mstns:Unit"/>
-          <xs:attribute name="Alignment" type="mstns:Alignment"/>
+          <xs:attribute name="BeforeParagraph" type="mstns:Unit" default="0 mm"/>
+          <xs:attribute name="AfterParagraph" type="mstns:Unit" default="0 mm"/>
+          <xs:attribute name="Alignment" type="mstns:Alignment" default="Near"/>
         </xs:extension>
       </xs:complexContent>
 
@@ -380,6 +458,10 @@
     <xs:attribute name="FontStyle" type="mstns:FontStyle"/>
     <xs:attribute name="EmSize" type="xs:double"/>
     <xs:attribute name="FontName" type="xs:string"/>
+
+    <xs:attribute name="Color" type="color"/>
+    <xs:attribute name="Language" type="Language"/>
+
 
     <xs:attribute name="IsVisible" type="xs:boolean" default="true"/>
     <xs:attribute name="IsVisiblePath" type="xs:string"/>

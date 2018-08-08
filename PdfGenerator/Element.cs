@@ -1,4 +1,5 @@
 ﻿using PdfSharp.Drawing;
+using Serilizer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -42,24 +43,25 @@ namespace PdfGenerator
     public class Paragraph : IChild<Paragraph>
     {
 
-        public const string DEFAULT_FONT_NAME = "Verdana";
-        public const double DEFAULT_EM_SIZE = 12.0;
+
         private IList<IChild<Run>> _runs;
 
         public IList<IChild<Run>> Runs { get => _runs ?? (_runs = new List<IChild<Run>>()); set => _runs = value; }
         /// <summary>
         /// Linespace relativ to normal linespacing.
         /// </summary>
-        public ContextValue<double> Linespacing { get; set; } = 1.0;
+        public ContextValue<double> Linespacing { get; set; }
 
         public ContextValue<XUnit> BeforeParagraph { get; set; }
         public ContextValue<XUnit> AfterParagraph { get; set; }
 
-        public ContextValue<XFontStyle> FontStyle { get; set; } = XFontStyle.Regular;
-        public ContextValue<double> EmSize { get; set; } = DEFAULT_EM_SIZE;
-        public ContextValue<string> FontName { get; set; } = DEFAULT_FONT_NAME;
-        public ContextValue<bool> IsVisible { get; set; } = true;
+        public ContextValue<XFontStyle> FontStyle { get; set; }
+        public ContextValue<double> EmSize { get; set; }
+        public ContextValue<string> FontName { get; set; }
+        public ContextValue<XColor> Color { get; set; }
+        public ContextValue<bool> IsVisible { get; set; }
         public ContextValue<XLineAlignment> Alignment { get; set; }
+        public Language Language { get; internal set; }
 
         public Paragraph()
         {
@@ -114,7 +116,10 @@ namespace PdfGenerator
         private ContextValue<string>? _fontName;
         private ContextValue<double>? _emSize;
         private ContextValue<XFontStyle>? _fontStyle;
+        private ContextValue<XColor>? _color;
+        private ContextValue<Language>? _language;
 
+        public ContextValue<Language>? Language { get => this._language ?? this.Paragraph.Language; internal set => _language = value; }
         public ContextValue<XFontStyle>? FontStyle { get => this._fontStyle ?? this.Paragraph.FontStyle; set => this._fontStyle = value; }
         public ContextValue<double>? EmSize { get => this._emSize ?? this.Paragraph.EmSize; set => this._emSize = value; }
         public ContextValue<string>? FontName
@@ -129,6 +134,8 @@ namespace PdfGenerator
                     this._fontName = value.Value;
             }
         }
+
+        public ContextValue<XColor>? Color { get => this._color ?? this.Paragraph.Color; set => this._color = value; }
 
         public ContextValue<bool> IsVisible { get; set; } = true;
         public Paragraph Paragraph { get; }

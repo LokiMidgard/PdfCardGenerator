@@ -1,4 +1,5 @@
-﻿using PdfCardGenerator;
+﻿using NHyphenator;
+using PdfCardGenerator;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System;
@@ -11,10 +12,14 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
+
+
 namespace PdfGenerator
 {
     public class PageTemplate
     {
+        public Project Project { get; set; }
+
         public XUnit Width { get; set; }
         public XUnit Height { get; set; }
 
@@ -23,9 +28,9 @@ namespace PdfGenerator
         public IList<Element> Elements { get; set; } = new List<Element>();
         public RelativePath? XSLT { get; internal set; }
 
+
         public PdfDocument GetDocuments(XDocument document, IXmlNamespaceResolver resolver)
         {
-
             return GetDocuments(document.XPathSelectElements(this.ContextPath.Path, resolver), resolver);
         }
         private PdfDocument GetDocuments(IEnumerable<XElement> elements, IXmlNamespaceResolver resolver)
@@ -177,6 +182,7 @@ namespace PdfGenerator
                                             EmSize = textRun.EmSize,
                                             FontName = textRun.FontName,
                                             IsVisible = textRun.IsVisible,
+                                            Color = textRun.Color,
                                             FontStyle = textRun.FontStyle,
                                             Text = builder.ToString()
                                         });
@@ -197,6 +203,7 @@ namespace PdfGenerator
                                         {
                                             EmSize = textRun.EmSize,
                                             FontName = textRun.FontName,
+                                            Color = textRun.Color,
                                             IsVisible = textRun.IsVisible,
                                             FontStyle = textRun.FontStyle,
                                             Text = builder.ToString()
@@ -208,6 +215,7 @@ namespace PdfGenerator
                                             Alignment = currentP.Alignment,
                                             BeforeParagraph = currentP.BeforeParagraph,
                                             EmSize = currentP.EmSize,
+                                            Color = currentP.Color,
                                             FontName = currentP.FontName,
                                             FontStyle = currentP.FontStyle,
                                             IsVisible = currentP.IsVisible,
@@ -230,6 +238,7 @@ namespace PdfGenerator
                                 {
                                     EmSize = textRun.EmSize,
                                     FontName = textRun.FontName,
+                                    Color = textRun.Color,
                                     IsVisible = textRun.IsVisible,
                                     FontStyle = textRun.FontStyle,
                                     Text = builder.ToString()
@@ -245,6 +254,7 @@ namespace PdfGenerator
                                         currentP.Runs.Add(new TextRun(currentP)
                                         {
                                             EmSize = textRun.EmSize,
+                                            Color = textRun.Color,
                                             FontName = textRun.FontName,
                                             IsVisible = textRun.IsVisible,
                                             FontStyle = textRun.FontStyle,
@@ -273,6 +283,7 @@ namespace PdfGenerator
                                 {
                                     EmSize = textRun.EmSize,
                                     FontName = textRun.FontName,
+                                    Color = textRun.Color,
                                     IsVisible = textRun.IsVisible,
                                     FontStyle = textRun.FontStyle,
                                     Text = builder.ToString()
@@ -289,7 +300,7 @@ namespace PdfGenerator
         }
 
 
-        private static void HandleTextElement(IXmlNamespaceResolver resolver, XElement context, XGraphics gfx, TextElement textElement)
+        private void HandleTextElement(IXmlNamespaceResolver resolver, XElement context, XGraphics gfx, TextElement textElement)
         {
             var position = textElement.Position.GetValue(context, resolver);
 
@@ -347,7 +358,7 @@ namespace PdfGenerator
 
         }
 
-        private static bool ExpandRuns(IChild<Run> child, Paragraph paragraph, XGraphics gfx, XRect frame, XPoint startPosition, ref XPoint currentPosition, List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>> lines, List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)> currentLine, IXmlNamespaceResolver resolver, XElement context)
+        private bool ExpandRuns(IChild<Run> child, Paragraph paragraph, XGraphics gfx, XRect frame, XPoint startPosition, ref XPoint currentPosition, List<List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)>> lines, List<(string textToPrint, XFont font, XBrush brush, XPoint printPosition, XLineAlignment alignment, XSize size)> currentLine, IXmlNamespaceResolver resolver, XElement context)
         {
             if (child is ForeEach<Run> forEach)
             {
@@ -380,32 +391,154 @@ namespace PdfGenerator
                     if (string.IsNullOrEmpty(textForRun))
                         return true;
 
-                    var wordSizes = textForRun.Split(' ').Select(x => new { Size = gfx.MeasureString(x, font), Word = x }).ToArray();
+                    var hypenator = new Hyphenator(new HyphenatePatternsLoader(run.Language.Value.GetValue(context, resolver)), "\u00AD");
+                    textForRun = hypenator.HyphenateText(textForRun);
+
+
+                    IEnumerable<(string text, XSize size, XFont font, LastSplit lastSplit)> CalculateSizes()
+                    {
+                        int start = 0;
+                        var lastSplit = LastSplit.StartOfText;
+                        bool isSurrugate = false;
+                        for (int i = 0; i < textForRun.Length; i += isSurrugate ? 2 : 1)
+                        {
+                            isSurrugate = char.IsHighSurrogate(textForRun[i]);
+
+                            if (textForRun[i] == ' ') // possible cut
+                            {
+                                var text = textForRun.Substring(start, i - start); // cant be surrogate
+                                yield return (text, gfx.MeasureString(text, font), font, lastSplit);
+                                lastSplit = LastSplit.Space;
+                                start = i + 1;
+                            }
+                            else if (textForRun[i] == '\u00AD')
+                            {
+                                var text = textForRun.Substring(start, i - start); // cant be surrogate
+                                yield return (text, gfx.MeasureString(text, font), font, lastSplit);
+                                lastSplit = LastSplit.Hyphon;
+                                start = i + 1;
+                            }
+                            else if (!font.IsCharSupported(textForRun, i))
+                            {
+                                var text = textForRun.Substring(start, i - start);
+                                if (text != "")
+                                {
+
+                                    yield return (text, gfx.MeasureString(text, font), font, lastSplit);
+                                    lastSplit = LastSplit.NoSplit;
+                                }
+                                start = i;
+
+                                // now the unsupported character
+
+                                var substituteFont = Project.FallbackFonts.Select(x => new XFont(x, font.Size, font.Style)).FirstOrDefault(x => x.IsCharSupported(textForRun, i));
+
+                                if (substituteFont == null)
+                                {
+                                    if (this.Project.CharacterNotFound == null)
+                                        throw new Exception("Character is not supported by any font.");
+
+                                    substituteFont = new XFont(Project.CharacterNotFound.FamilyName, font.Size, font.Style);
+
+                                    text = Project.CharacterNotFound.SubstituteCharacter;
+                                    yield return (text, gfx.MeasureString(text, substituteFont), substituteFont, lastSplit);
+                                    lastSplit = LastSplit.NoSplit;
+                                    start = i + 1;
+                                }
+                                else
+                                {
+                                    text = textForRun.Substring(start, (isSurrugate ? 2 : 1)); // additional -1 for the current char
+                                    yield return (text, gfx.MeasureString(text, substituteFont), substituteFont, lastSplit);
+                                    lastSplit = LastSplit.NoSplit;
+                                    start = i + (isSurrugate ? 2 : 1);
+                                }
+                            }
+                        }
+                        {
+                            var text = textForRun.Substring(start); // additional -1 for the hyphon itself
+                            yield return (text, gfx.MeasureString(text, font), font, lastSplit);
+                        }
+                    }
+
+
+                    var wordSizes = CalculateSizes().Where(x => x.text.Length > 0).ToArray();
                     var spaceSize = gfx.MeasureString(" ", font);
+                    var hyphonSize = gfx.MeasureString("-", font);
+
+
 
                     int wordsToPrint;
                     for (int i = 0; i < wordSizes.Length; i += wordsToPrint)
                     {
+                        bool addHyphon = false;
+                        bool addSpace = true;
                         double lineWidth = 0;
                         bool endOfLine = false;
                         for (wordsToPrint = 0; wordsToPrint + i < wordSizes.Length; wordsToPrint++)
                         {
                             var w = wordSizes[i + wordsToPrint];
+                            var nextW = (i + wordsToPrint + 1 < wordSizes.Length) ? new(string text, XSize size, XFont font, LastSplit lastSplit)?(wordSizes[i + wordsToPrint + 1]) : null;
 
-                            if (w.Size.Width + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                            //check if font has changed and we need to make an additional draw call
+                            if (nextW != null && w.font != nextW?.font)
                             {
+                                addSpace = false;
+                                break;
+                            }
+
+                            // check if line is to short and we need a line break
+                            if (w.size.Width + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                            {
+                                var currentW = w;
+                                var previousW = (i + wordsToPrint - 1 > 0) ? new(string text, XSize size, XFont font, LastSplit lastSplit)?(wordSizes[i + wordsToPrint - 1]) : null;
                                 // we are over the bounding. set current Position to next line
+                                while (currentW.lastSplit == LastSplit.Hyphon && currentPosition.X + lineWidth + hyphonSize.Width > frame.Right && previousW != null) // the hyphon alos is to long, so one part lesss
+                                {
+                                    wordsToPrint--;
+                                    lineWidth -= previousW.Value.size.Width;
+                                    if (previousW.Value.lastSplit == LastSplit.Space && lineWidth != previousW.Value.size.Width /* the beginning of a line*/)
+                                        lineWidth -= spaceSize.Width;
+
+                                    currentW = previousW.Value;
+                                    previousW = (i + wordsToPrint - 1 > 0) ? new(string text, XSize size, XFont font, LastSplit lastSplit)?(wordSizes[i + wordsToPrint - 1]) : null;
+                                }
+                                if (currentW.lastSplit == LastSplit.Hyphon)
+                                    addHyphon = true;
                                 endOfLine = true;
                                 break;
                             }
-                            lineWidth += w.Size.Width + (wordsToPrint == 0 ? 0 : spaceSize.Width);
+                            lineWidth += w.size.Width;
+                            if (w.lastSplit == LastSplit.Space && lineWidth != 0 /* the beginning of a line*/)
+                                lineWidth += spaceSize.Width;
                         }
                         wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
 
-                        var textToPrint = string.Join(" ", wordSizes.Skip(i).Take(wordsToPrint).Select(x => x.Word));
 
-                        currentLine.Add((textToPrint, font, XBrushes.Black, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, font)));
-                        currentPosition = new XPoint(currentPosition.X + spaceSize.Width + lineWidth, currentPosition.Y);
+                        var printFont = wordSizes.Skip(i).Take(wordsToPrint).First().font;
+                        var printWidth = wordSizes.Skip(i).Take(wordsToPrint).Sum(x => x.size.Width);
+
+                        var textToPrint = wordSizes.Skip(i).Take(wordsToPrint).Aggregate("", (previousText, x2) =>
+                         {
+                             switch (x2.lastSplit)
+                             {
+                                 case LastSplit.NoSplit:
+                                 case LastSplit.StartOfText:
+                                 case LastSplit.Hyphon:
+                                     return previousText + x2.text;
+                                 case LastSplit.Space:
+                                     if (previousText != "")
+                                         return previousText + " " + x2.text;
+                                     return x2.text;
+                                 default:
+                                     throw new NotSupportedException();
+                             }
+                         });
+                        if (addHyphon)
+                            textToPrint += "-";
+
+                        var brush = new XSolidBrush(run.Color.Value.GetValue(context, resolver));
+                        currentLine.Add((textToPrint, printFont, brush, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, printFont)));
+                        currentPosition = new XPoint(currentPosition.X + (addSpace ? spaceSize.Width : 0) + printWidth, currentPosition.Y);
 
                         if (endOfLine)
                         {
@@ -414,7 +547,7 @@ namespace PdfGenerator
                             lines.Add(currentLine);
                         }
 
-                        if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.Size.Height) + currentPosition.Y > frame.Bottom)
+                        if (wordSizes.Skip(i).Take(wordsToPrint).Max(x => x.size.Height) + currentPosition.Y > frame.Bottom)
                             return false; // reached end of box
 
 
@@ -427,6 +560,13 @@ namespace PdfGenerator
         }
 
 
+        private enum LastSplit
+        {
+            NoSplit,
+            StartOfText,
+            Space,
+            Hyphon,
+        }
     }
 
 

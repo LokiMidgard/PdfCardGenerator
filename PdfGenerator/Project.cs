@@ -11,6 +11,7 @@ using Serilizer;
 using System.Xml;
 using PdfSharp.Pdf.IO;
 using System.IO;
+using PdfSharp.Fonts;
 
 namespace PdfGenerator
 {
@@ -20,6 +21,10 @@ namespace PdfGenerator
         public IEnumerable<PageTemplate> Templates { get; set; }
         public XDocument Document { get; private set; }
 
+        public IFontResolver FontResolver { get; set; }
+        public Language DefaultLanguage { get; set; }
+        public string[] FallbackFonts { get; private set; }
+        public ProjectFallbackFontsNotFoundCharacter CharacterNotFound { get; private set; }
 
         public static Project Load(string path)
         {
@@ -30,79 +35,6 @@ namespace PdfGenerator
         public static Project Load(System.IO.Stream stream, DirectoryInfo workingDirectory)
         {
 
-            IChild<Paragraph> GetParagraps(Serilizer.ForeEachParagraph p)
-            {
-                return new ForeEach<Paragraph>()
-                {
-                    IsVisible = GetVisible(p),
-                    Select = p.Select,
-                    Childrean = p.Items.Select(x =>
-                    {
-                        if (x is Serilizer.ForeEachParagraph newForEach)
-                            return GetParagraps(newForEach);
-                        else if (x is Serilizer.Paragraph newP)
-                            return GetParagrap(newP);
-                        else
-                            throw new NotSupportedException();
-                    }).ToArray()
-                };
-
-            }
-
-            IChild<Paragraph> GetParagrap(Serilizer.Paragraph p)
-            {
-                var result = new Paragraph
-                {
-                    AfterParagraph = (XUnit)(p.AfterParagraph ?? XUnit.Zero),
-                    BeforeParagraph = (XUnit)(p.BeforeParagraph ?? XUnit.Zero),
-                    Alignment = p.AlignmentSpecified ? TransformAlignment(p.Alignment) : XLineAlignment.Near,
-                    EmSize = p.EmSizeSpecified ? p.EmSize : Paragraph.DEFAULT_EM_SIZE,
-                    IsVisible = GetVisible(p),
-                    Linespacing = p.Linespacing,
-                    FontName = p.FontName ?? Paragraph.DEFAULT_FONT_NAME,
-                    FontStyle = TransformFontStyle(p.FontStyle)
-                };
-
-                IChild<Run> GetRun(Serilizer.Run run)
-                {
-                    if (run is LineBreak lineBreak)
-                    {
-                        return new LineBreakRun(result)
-                        {
-
-                            FontStyle = lineBreak.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(lineBreak.FontStyle)) : null,
-                            EmSize = lineBreak.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(lineBreak.EmSize) : null,
-                            FontName = lineBreak.FontName,
-                            IsVisible = GetVisible(lineBreak)
-                        };
-                    }
-                    else if (run is Serilizer.TextRun textRun)
-                    {
-                        return new TextRun(result)
-                        {
-                            FontStyle = textRun.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(textRun.FontStyle)) : null,
-                            EmSize = textRun.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(textRun.EmSize) : null,
-                            FontName = textRun.FontName,
-                            IsVisible = GetVisible(textRun),
-                            Text = textRun.ItemElementName == ItemChoiceType.Text ? textRun.Item : ContextValue<string>.FromXPath(textRun.Item)
-                        };
-                    }
-                    else if (run is Serilizer.ForEachRun forEach)
-                    {
-                        return new ForeEach<Run>()
-                        {
-                            IsVisible = GetVisible(forEach),
-                            Select = forEach.Select,
-                            Childrean = forEach.Items.Select(GetRun).ToArray()
-                        };
-                    }
-                    else
-                        throw new NotSupportedException($"THe type {run?.GetType()} is not supported");
-                }
-                result.Runs = p.Items.Select(GetRun).ToArray();
-                return result;
-            }
-
             var doc = XDocument.Load(stream);
 
             Serilizer.Project deserilisation;
@@ -110,7 +42,7 @@ namespace PdfGenerator
             using (var reader = doc.CreateReader())
                 deserilisation = (Serilizer.Project)serializer.Deserialize(reader);
 
-            var templates = deserilisation.Template.Select(original =>
+            var templates = deserilisation.Templates.Select(original =>
             {
                 return new PageTemplate
                 {
@@ -126,8 +58,8 @@ namespace PdfGenerator
                             {
                                 IsVisible = GetVisible(textElement),
                                 Position = GetPosition(textElement),
-                                Rotation =textElement.rotation,
-                                RotationOrigin= new XPoint(textElement.rotationOriginX,textElement.rotationOriginY),
+                                Rotation = textElement.rotation,
+                                RotationOrigin = new XPoint(textElement.rotationOriginX, textElement.rotationOriginY),
                                 ZIndex = textElement.ZPosition,
                                 Paragraphs = textElement.Items.Select(child =>
                                 {
@@ -147,8 +79,8 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(imageElement),
                                 Position = GetPosition(imageElement),
                                 ZIndex = imageElement.ZPosition,
-                                Rotation =imageElement.rotation,
-                                RotationOrigin= new XPoint(imageElement.rotationOriginX,imageElement.rotationOriginY),
+                                Rotation = imageElement.rotation,
+                                RotationOrigin = new XPoint(imageElement.rotationOriginX, imageElement.rotationOriginY),
                                 ImagePath = new RelativePath()
                                 {
                                     Path = GetImageLocation(),
@@ -213,8 +145,8 @@ namespace PdfGenerator
                                 IsVisible = GetVisible(rectElement),
                                 Position = frame,
                                 ZIndex = rectElement.ZPosition,
-                                Rotation =rectElement.rotation,
-                                RotationOrigin= new XPoint(rectElement.rotationOriginX,rectElement.rotationOriginY),
+                                Rotation = rectElement.rotation,
+                                RotationOrigin = new XPoint(rectElement.rotationOriginX, rectElement.rotationOriginY),
                                 FillColor = brush,
                                 BorderColor = pen
 
@@ -230,11 +162,132 @@ namespace PdfGenerator
                 };
 
             }).ToArray();
-            return new Project()
+            var fontResolver = new FontResolver(deserilisation.Fonts.UseSystemFallback);
+
+            foreach (var f in deserilisation.Fonts.Font)
             {
+                using (var fontStream = File.OpenRead(f.Regular.Path))
+                    fontResolver.AddFont(
+                        familyName: f.FamilyName,
+                        boldStyle: PdfGenerator.FontResolver.BoldStyle.None,
+                        italicStyle: PdfGenerator.FontResolver.ItalicStyle.None,
+                        stream: fontStream);
+
+                using (var fontStream = File.OpenRead(f.Italic?.Path ?? f.Regular.Path))
+                    fontResolver.AddFont(
+                        familyName: f.FamilyName,
+                        boldStyle: PdfGenerator.FontResolver.BoldStyle.None,
+                        italicStyle: f.Italic != null ? PdfGenerator.FontResolver.ItalicStyle.Applyed : PdfGenerator.FontResolver.ItalicStyle.Simulate,
+                        stream: fontStream);
+
+                using (var fontStream = File.OpenRead(f.Bold?.Path ?? f.Regular.Path))
+                    fontResolver.AddFont(
+                        familyName: f.FamilyName,
+                        boldStyle: f.Bold != null ? PdfGenerator.FontResolver.BoldStyle.Applyed : PdfGenerator.FontResolver.BoldStyle.Simulate,
+                        italicStyle: PdfGenerator.FontResolver.ItalicStyle.None,
+                        stream: fontStream);
+
+                using (var fontStream = File.OpenRead(f.BoldItalic?.Path ?? f.Regular.Path))
+                    fontResolver.AddFont(
+                        familyName: f.FamilyName,
+                        boldStyle: f.Bold != null ? PdfGenerator.FontResolver.BoldStyle.Applyed : PdfGenerator.FontResolver.BoldStyle.Simulate,
+                        italicStyle: f.Italic != null ? PdfGenerator.FontResolver.ItalicStyle.Applyed : PdfGenerator.FontResolver.ItalicStyle.Simulate,
+                        stream: fontStream);
+
+            }
+
+            var project = new Project()
+            {
+                CharacterNotFound = deserilisation.FallbackFonts.NotFoundCharacter,
+                FallbackFonts = deserilisation.FallbackFonts.Font.Select(x => x.FamilyName).ToArray(),
+                DefaultLanguage = deserilisation.DefaultLanguage,
+                FontResolver = fontResolver,
                 Templates = templates,
                 Document = doc
             };
+            foreach (var tempalte in project.Templates)
+                tempalte.Project = project;
+            return project;
+
+
+
+            IChild<Paragraph> GetParagraps(Serilizer.ForeEachParagraph p)
+            {
+                return new ForeEach<Paragraph>()
+                {
+                    IsVisible = GetVisible(p),
+                    Select = p.Select,
+                    Childrean = p.Items.Select(x =>
+                    {
+                        if (x is Serilizer.ForeEachParagraph newForEach)
+                            return GetParagraps(newForEach);
+                        else if (x is Serilizer.Paragraph newP)
+                            return GetParagrap(newP);
+                        else
+                            throw new NotSupportedException();
+                    }).ToArray()
+                };
+
+            }
+
+            IChild<Paragraph> GetParagrap(Serilizer.Paragraph p)
+            {
+                var result = new Paragraph
+                {
+                    AfterParagraph = (XUnit)(p.AfterParagraph ?? XUnit.Zero),
+                    BeforeParagraph = (XUnit)(p.BeforeParagraph ?? XUnit.Zero),
+                    Alignment = TransformAlignment(p.Alignment),
+                    EmSize = p.EmSize,
+                    IsVisible = GetVisible(p),
+                    Color = GetColorFromString(p.Color),
+                    Linespacing = p.Linespacing,
+                    Language = p.LanguageSpecified ? p.Language : deserilisation.DefaultLanguage,
+                    FontName = p.FontName ?? deserilisation.Fonts.DefaultFont,
+                    FontStyle = TransformFontStyle(p.FontStyle)
+                };
+
+                IChild<Run> GetRun(Serilizer.Run run)
+                {
+                    if (run is LineBreak lineBreak)
+                    {
+                        return new LineBreakRun(result)
+                        {
+
+                            FontStyle = lineBreak.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(lineBreak.FontStyle)) : null,
+                            EmSize = lineBreak.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(lineBreak.EmSize) : null,
+                            FontName = lineBreak.FontName,
+                            IsVisible = GetVisible(lineBreak)
+                        };
+                    }
+                    else if (run is Serilizer.TextRun textRun)
+                    {
+                        return new TextRun(result)
+                        {
+                            FontStyle = textRun.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(textRun.FontStyle)) : null,
+                            EmSize = textRun.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(textRun.EmSize) : null,
+                            Language = textRun.LanguageSpecified ? (ContextValue<Language>?)ContextValue<Language>.FromValue(textRun.Language) : null,
+                            FontName = textRun.FontName,
+                            Color = textRun.Color == null ? (XColor?)null : GetColorFromString(textRun.Color),
+                            IsVisible = GetVisible(textRun),
+                            Text = textRun.ItemElementName == ItemChoiceType.Text ? textRun.Item : ContextValue<string>.FromXPath(textRun.Item)
+                        };
+                    }
+                    else if (run is Serilizer.ForEachRun forEach)
+                    {
+                        return new ForeEach<Run>()
+                        {
+                            IsVisible = GetVisible(forEach),
+                            Select = forEach.Select,
+                            Childrean = forEach.Items.Select(GetRun).ToArray()
+                        };
+                    }
+                    else
+                        throw new NotSupportedException($"THe type {run?.GetType()} is not supported");
+                }
+                result.Runs = p.Items.Select(GetRun).ToArray();
+                return result;
+            }
+
         }
 
         private static XColor GetColorFromString(string colorString)
@@ -263,6 +316,8 @@ namespace PdfGenerator
                 PageLayout = PdfPageLayout.SinglePage
             };
             var navigator = this.Document.Root.CreateNavigator();
+            GlobalFontSettings.FontResolver = this.FontResolver;
+
 
             foreach (var item in this.Templates)
             {
@@ -329,7 +384,8 @@ namespace PdfGenerator
             if (imageElement.IsVisiblePath != null)
                 return new XPath(imageElement.IsVisiblePath);
             else
-                return imageElement.IsVisible ;
+                return imageElement.IsVisible;
         }
     }
+
 }

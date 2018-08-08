@@ -26,16 +26,53 @@ namespace Serilizer {
         "LImport.xsd", IsNullable=false)]
     public partial class Project {
         
-        private ProjectTemplate[] templateField;
+        private ProjectFonts fontsField;
+        
+        private ProjectFallbackFonts fallbackFontsField;
+        
+        private ProjectTemplate[] templatesField;
+        
+        private Language defaultLanguageField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Template")]
-        public ProjectTemplate[] Template {
+        public ProjectFonts Fonts {
             get {
-                return this.templateField;
+                return this.fontsField;
             }
             set {
-                this.templateField = value;
+                this.fontsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public ProjectFallbackFonts FallbackFonts {
+            get {
+                return this.fallbackFontsField;
+            }
+            set {
+                this.fallbackFontsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("Template", IsNullable=false)]
+        public ProjectTemplate[] Templates {
+            get {
+                return this.templatesField;
+            }
+            set {
+                this.templatesField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public Language DefaultLanguage {
+            get {
+                return this.defaultLanguageField;
+            }
+            set {
+                this.defaultLanguageField = value;
             }
         }
     }
@@ -47,72 +84,122 @@ namespace Serilizer {
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
         "LImport.xsd")]
-    public partial class ProjectTemplate {
+    public partial class ProjectFonts {
         
-        private BaseElement[] itemsField;
+        private ProjectFontsFont[] fontField;
         
-        private string contextField;
+        private bool useSystemFallbackField;
         
-        private string widthField;
+        private string defaultFontField;
         
-        private string heightField;
-        
-        private string xsltField;
+        public ProjectFonts() {
+            this.useSystemFallbackField = true;
+            this.defaultFontField = "Verdana";
+        }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Image", typeof(ImageElement))]
-        [System.Xml.Serialization.XmlElementAttribute("Rect", typeof(RectElement))]
-        [System.Xml.Serialization.XmlElementAttribute("Text", typeof(TextElement))]
-        public BaseElement[] Items {
+        [System.Xml.Serialization.XmlElementAttribute("Font")]
+        public ProjectFontsFont[] Font {
             get {
-                return this.itemsField;
+                return this.fontField;
             }
             set {
-                this.itemsField = value;
+                this.fontField = value;
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Context {
+        [System.ComponentModel.DefaultValueAttribute(true)]
+        public bool UseSystemFallback {
             get {
-                return this.contextField;
+                return this.useSystemFallbackField;
             }
             set {
-                this.contextField = value;
+                this.useSystemFallbackField = value;
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Width {
+        [System.ComponentModel.DefaultValueAttribute("Verdana")]
+        public string DefaultFont {
             get {
-                return this.widthField;
+                return this.defaultFontField;
             }
             set {
-                this.widthField = value;
+                this.defaultFontField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class ProjectFontsFont {
+        
+        private FontLocation regularField;
+        
+        private FontLocation italicField;
+        
+        private FontLocation boldField;
+        
+        private FontLocation boldItalicField;
+        
+        private string familyNameField;
+        
+        /// <remarks/>
+        public FontLocation Regular {
+            get {
+                return this.regularField;
+            }
+            set {
+                this.regularField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public FontLocation Italic {
+            get {
+                return this.italicField;
+            }
+            set {
+                this.italicField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public FontLocation Bold {
+            get {
+                return this.boldField;
+            }
+            set {
+                this.boldField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public FontLocation BoldItalic {
+            get {
+                return this.boldItalicField;
+            }
+            set {
+                this.boldItalicField = value;
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Height {
+        public string FamilyName {
             get {
-                return this.heightField;
+                return this.familyNameField;
             }
             set {
-                this.heightField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Xslt {
-            get {
-                return this.xsltField;
-            }
-            set {
-                this.xsltField = value;
+                this.familyNameField = value;
             }
         }
     }
@@ -124,33 +211,601 @@ namespace Serilizer {
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
         "LImport.xsd")]
-    public partial class ImageElement : BaseElement {
+    public partial class FontLocation {
         
-        private string imageLocationPathField;
-        
-        private string imageLocationField;
+        private string pathField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string ImageLocationPath {
+        public string Path {
             get {
-                return this.imageLocationPathField;
+                return this.pathField;
             }
             set {
-                this.imageLocationPathField = value;
+                this.pathField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class Fill {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public abstract partial class Run {
+        
+        private FontStyle fontStyleField;
+        
+        private bool fontStyleFieldSpecified;
+        
+        private double emSizeField;
+        
+        private bool emSizeFieldSpecified;
+        
+        private string fontNameField;
+        
+        private string colorField;
+        
+        private Language languageField;
+        
+        private bool languageFieldSpecified;
+        
+        private bool isVisibleField;
+        
+        private string isVisiblePathField;
+        
+        public Run() {
+            this.isVisibleField = true;
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public FontStyle FontStyle {
+            get {
+                return this.fontStyleField;
+            }
+            set {
+                this.fontStyleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool FontStyleSpecified {
+            get {
+                return this.fontStyleFieldSpecified;
+            }
+            set {
+                this.fontStyleFieldSpecified = value;
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string ImageLocation {
+        public double EmSize {
             get {
-                return this.imageLocationField;
+                return this.emSizeField;
             }
             set {
-                this.imageLocationField = value;
+                this.emSizeField = value;
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool EmSizeSpecified {
+            get {
+                return this.emSizeFieldSpecified;
+            }
+            set {
+                this.emSizeFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string FontName {
+            get {
+                return this.fontNameField;
+            }
+            set {
+                this.fontNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Color {
+            get {
+                return this.colorField;
+            }
+            set {
+                this.colorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public Language Language {
+            get {
+                return this.languageField;
+            }
+            set {
+                this.languageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool LanguageSpecified {
+            get {
+                return this.languageFieldSpecified;
+            }
+            set {
+                this.languageFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(true)]
+        public bool IsVisible {
+            get {
+                return this.isVisibleField;
+            }
+            set {
+                this.isVisibleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string IsVisiblePath {
+            get {
+                return this.isVisiblePathField;
+            }
+            set {
+                this.isVisiblePathField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public enum FontStyle {
+        
+        /// <remarks/>
+        Regular,
+        
+        /// <remarks/>
+        Bold,
+        
+        /// <remarks/>
+        Italic,
+        
+        /// <remarks/>
+        BoldItalic,
+        
+        /// <remarks/>
+        Underline,
+        
+        /// <remarks/>
+        Strikeout,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public enum Language {
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("de-DE")]
+        deDE,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("en-US")]
+        enUS,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("en-GB")]
+        enGB,
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlEnumAttribute("ru-RU")]
+        ruRU,
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ForeEachParagraph))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public abstract partial class AbstractParagraph {
+        
+        private bool isVisibleField;
+        
+        private string isVisiblePathField;
+        
+        public AbstractParagraph() {
+            this.isVisibleField = true;
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(true)]
+        public bool IsVisible {
+            get {
+                return this.isVisibleField;
+            }
+            set {
+                this.isVisibleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string IsVisiblePath {
+            get {
+                return this.isVisiblePathField;
+            }
+            set {
+                this.isVisiblePathField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class ForeEachParagraph : AbstractParagraph {
+        
+        private AbstractParagraph[] itemsField;
+        
+        private string selectField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForeEachParagraph))]
+        [System.Xml.Serialization.XmlElementAttribute("Paragraph", typeof(Paragraph))]
+        public AbstractParagraph[] Items {
+            get {
+                return this.itemsField;
+            }
+            set {
+                this.itemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Select {
+            get {
+                return this.selectField;
+            }
+            set {
+                this.selectField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
+    public partial class Paragraph : AbstractParagraph {
+        
+        private Run[] itemsField;
+        
+        private FontStyle fontStyleField;
+        
+        private double emSizeField;
+        
+        private string fontNameField;
+        
+        private string colorField;
+        
+        private Language languageField;
+        
+        private bool languageFieldSpecified;
+        
+        private double linespacingField;
+        
+        private string beforeParagraphField;
+        
+        private string afterParagraphField;
+        
+        private Alignment alignmentField;
+        
+        public Paragraph() {
+            this.fontStyleField = FontStyle.Regular;
+            this.emSizeField = 12D;
+            this.colorField = "Black";
+            this.linespacingField = 1D;
+            this.beforeParagraphField = "0 mm";
+            this.afterParagraphField = "0 mm";
+            this.alignmentField = Alignment.Near;
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ForEachRun", typeof(ForEachRun))]
+        [System.Xml.Serialization.XmlElementAttribute("LineBreak", typeof(LineBreak))]
+        [System.Xml.Serialization.XmlElementAttribute("TextRun", typeof(TextRun))]
+        public Run[] Items {
+            get {
+                return this.itemsField;
+            }
+            set {
+                this.itemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(FontStyle.Regular)]
+        public FontStyle FontStyle {
+            get {
+                return this.fontStyleField;
+            }
+            set {
+                this.fontStyleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(12D)]
+        public double EmSize {
+            get {
+                return this.emSizeField;
+            }
+            set {
+                this.emSizeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string FontName {
+            get {
+                return this.fontNameField;
+            }
+            set {
+                this.fontNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute("Black")]
+        public string Color {
+            get {
+                return this.colorField;
+            }
+            set {
+                this.colorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public Language Language {
+            get {
+                return this.languageField;
+            }
+            set {
+                this.languageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool LanguageSpecified {
+            get {
+                return this.languageFieldSpecified;
+            }
+            set {
+                this.languageFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(1D)]
+        public double Linespacing {
+            get {
+                return this.linespacingField;
+            }
+            set {
+                this.linespacingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute("0 mm")]
+        public string BeforeParagraph {
+            get {
+                return this.beforeParagraphField;
+            }
+            set {
+                this.beforeParagraphField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute("0 mm")]
+        public string AfterParagraph {
+            get {
+                return this.afterParagraphField;
+            }
+            set {
+                this.afterParagraphField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(Alignment.Near)]
+        public Alignment Alignment {
+            get {
+                return this.alignmentField;
+            }
+            set {
+                this.alignmentField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
+    public partial class ForEachRun : Run {
+        
+        private Run[] itemsField;
+        
+        private string selectField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ForEachRun", typeof(ForEachRun))]
+        [System.Xml.Serialization.XmlElementAttribute("LineBreak", typeof(LineBreak))]
+        [System.Xml.Serialization.XmlElementAttribute("TextRun", typeof(TextRun))]
+        public Run[] Items {
+            get {
+                return this.itemsField;
+            }
+            set {
+                this.itemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Select {
+            get {
+                return this.selectField;
+            }
+            set {
+                this.selectField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
+    public partial class LineBreak : Run {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IsNullable=false)]
+    public partial class TextRun : Run {
+        
+        private string itemField;
+        
+        private ItemChoiceType itemElementNameField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Text", typeof(string))]
+        [System.Xml.Serialization.XmlElementAttribute("TextPath", typeof(string))]
+        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        public string Item {
+            get {
+                return this.itemField;
+            }
+            set {
+                this.itemField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public ItemChoiceType ItemElementName {
+            get {
+                return this.itemElementNameField;
+            }
+            set {
+                this.itemElementNameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd", IncludeInSchema=false)]
+    public enum ItemChoiceType {
+        
+        /// <remarks/>
+        Text,
+        
+        /// <remarks/>
+        TextPath,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public enum Alignment {
+        
+        /// <remarks/>
+        Near,
+        
+        /// <remarks/>
+        Center,
+        
+        /// <remarks/>
+        Far,
     }
     
     /// <remarks/>
@@ -316,503 +971,33 @@ namespace Serilizer {
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
         "LImport.xsd")]
-    public partial class Fill {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    public abstract partial class Run {
+    public partial class ImageElement : BaseElement {
         
-        private FontStyle fontStyleField;
+        private string imageLocationPathField;
         
-        private bool fontStyleFieldSpecified;
-        
-        private double emSizeField;
-        
-        private bool emSizeFieldSpecified;
-        
-        private string fontNameField;
-        
-        private bool isVisibleField;
-        
-        private string isVisiblePathField;
-        
-        public Run() {
-            this.isVisibleField = true;
-        }
+        private string imageLocationField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public FontStyle FontStyle {
+        public string ImageLocationPath {
             get {
-                return this.fontStyleField;
+                return this.imageLocationPathField;
             }
             set {
-                this.fontStyleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool FontStyleSpecified {
-            get {
-                return this.fontStyleFieldSpecified;
-            }
-            set {
-                this.fontStyleFieldSpecified = value;
+                this.imageLocationPathField = value;
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public double EmSize {
+        public string ImageLocation {
             get {
-                return this.emSizeField;
+                return this.imageLocationField;
             }
             set {
-                this.emSizeField = value;
+                this.imageLocationField = value;
             }
         }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool EmSizeSpecified {
-            get {
-                return this.emSizeFieldSpecified;
-            }
-            set {
-                this.emSizeFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string FontName {
-            get {
-                return this.fontNameField;
-            }
-            set {
-                this.fontNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        [System.ComponentModel.DefaultValueAttribute(true)]
-        public bool IsVisible {
-            get {
-                return this.isVisibleField;
-            }
-            set {
-                this.isVisibleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string IsVisiblePath {
-            get {
-                return this.isVisiblePathField;
-            }
-            set {
-                this.isVisiblePathField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    public enum FontStyle {
-        
-        /// <remarks/>
-        Regular,
-        
-        /// <remarks/>
-        Bold,
-        
-        /// <remarks/>
-        Italic,
-        
-        /// <remarks/>
-        BoldItalic,
-        
-        /// <remarks/>
-        Underline,
-        
-        /// <remarks/>
-        Strikeout,
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ForeEachParagraph))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    public abstract partial class AbstractParagraph {
-        
-        private bool isVisibleField;
-        
-        private string isVisiblePathField;
-        
-        public AbstractParagraph() {
-            this.isVisibleField = true;
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        [System.ComponentModel.DefaultValueAttribute(true)]
-        public bool IsVisible {
-            get {
-                return this.isVisibleField;
-            }
-            set {
-                this.isVisibleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string IsVisiblePath {
-            get {
-                return this.isVisiblePathField;
-            }
-            set {
-                this.isVisiblePathField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    public partial class ForeEachParagraph : AbstractParagraph {
-        
-        private AbstractParagraph[] itemsField;
-        
-        private string selectField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForeEachParagraph))]
-        [System.Xml.Serialization.XmlElementAttribute("Paragraph", typeof(Paragraph))]
-        public AbstractParagraph[] Items {
-            get {
-                return this.itemsField;
-            }
-            set {
-                this.itemsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Select {
-            get {
-                return this.selectField;
-            }
-            set {
-                this.selectField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd", IsNullable=false)]
-    public partial class Paragraph : AbstractParagraph {
-        
-        private Run[] itemsField;
-        
-        private FontStyle fontStyleField;
-        
-        private bool fontStyleFieldSpecified;
-        
-        private double emSizeField;
-        
-        private bool emSizeFieldSpecified;
-        
-        private string fontNameField;
-        
-        private double linespacingField;
-        
-        private string beforeParagraphField;
-        
-        private string afterParagraphField;
-        
-        private Alignment alignmentField;
-        
-        private bool alignmentFieldSpecified;
-        
-        public Paragraph() {
-            this.linespacingField = 1D;
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ForEachRun", typeof(ForEachRun))]
-        [System.Xml.Serialization.XmlElementAttribute("LineBreak", typeof(LineBreak))]
-        [System.Xml.Serialization.XmlElementAttribute("TextRun", typeof(TextRun))]
-        public Run[] Items {
-            get {
-                return this.itemsField;
-            }
-            set {
-                this.itemsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public FontStyle FontStyle {
-            get {
-                return this.fontStyleField;
-            }
-            set {
-                this.fontStyleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool FontStyleSpecified {
-            get {
-                return this.fontStyleFieldSpecified;
-            }
-            set {
-                this.fontStyleFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public double EmSize {
-            get {
-                return this.emSizeField;
-            }
-            set {
-                this.emSizeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool EmSizeSpecified {
-            get {
-                return this.emSizeFieldSpecified;
-            }
-            set {
-                this.emSizeFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string FontName {
-            get {
-                return this.fontNameField;
-            }
-            set {
-                this.fontNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        [System.ComponentModel.DefaultValueAttribute(1D)]
-        public double Linespacing {
-            get {
-                return this.linespacingField;
-            }
-            set {
-                this.linespacingField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string BeforeParagraph {
-            get {
-                return this.beforeParagraphField;
-            }
-            set {
-                this.beforeParagraphField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string AfterParagraph {
-            get {
-                return this.afterParagraphField;
-            }
-            set {
-                this.afterParagraphField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public Alignment Alignment {
-            get {
-                return this.alignmentField;
-            }
-            set {
-                this.alignmentField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool AlignmentSpecified {
-            get {
-                return this.alignmentFieldSpecified;
-            }
-            set {
-                this.alignmentFieldSpecified = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd", IsNullable=false)]
-    public partial class ForEachRun : Run {
-        
-        private Run[] itemsField;
-        
-        private string selectField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ForEachRun", typeof(ForEachRun))]
-        [System.Xml.Serialization.XmlElementAttribute("LineBreak", typeof(LineBreak))]
-        [System.Xml.Serialization.XmlElementAttribute("TextRun", typeof(TextRun))]
-        public Run[] Items {
-            get {
-                return this.itemsField;
-            }
-            set {
-                this.itemsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Select {
-            get {
-                return this.selectField;
-            }
-            set {
-                this.selectField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd", IsNullable=false)]
-    public partial class LineBreak : Run {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd", IsNullable=false)]
-    public partial class TextRun : Run {
-        
-        private string itemField;
-        
-        private ItemChoiceType itemElementNameField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Text", typeof(string))]
-        [System.Xml.Serialization.XmlElementAttribute("TextPath", typeof(string))]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
-        public string Item {
-            get {
-                return this.itemField;
-            }
-            set {
-                this.itemField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public ItemChoiceType ItemElementName {
-            get {
-                return this.itemElementNameField;
-            }
-            set {
-                this.itemElementNameField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd", IncludeInSchema=false)]
-    public enum ItemChoiceType {
-        
-        /// <remarks/>
-        Text,
-        
-        /// <remarks/>
-        TextPath,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
-        "LImport.xsd")]
-    public enum Alignment {
-        
-        /// <remarks/>
-        Near,
-        
-        /// <remarks/>
-        Center,
-        
-        /// <remarks/>
-        Far,
     }
     
     /// <remarks/>
@@ -1046,6 +1231,177 @@ namespace Serilizer {
             }
             set {
                 this.itemsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class ProjectFallbackFonts {
+        
+        private ProjectFallbackFontsFont[] fontField;
+        
+        private ProjectFallbackFontsNotFoundCharacter notFoundCharacterField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Font")]
+        public ProjectFallbackFontsFont[] Font {
+            get {
+                return this.fontField;
+            }
+            set {
+                this.fontField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public ProjectFallbackFontsNotFoundCharacter NotFoundCharacter {
+            get {
+                return this.notFoundCharacterField;
+            }
+            set {
+                this.notFoundCharacterField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class ProjectFallbackFontsFont {
+        
+        private string familyNameField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string FamilyName {
+            get {
+                return this.familyNameField;
+            }
+            set {
+                this.familyNameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class ProjectFallbackFontsNotFoundCharacter {
+        
+        private string familyNameField;
+        
+        private string substituteCharacterField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string FamilyName {
+            get {
+                return this.familyNameField;
+            }
+            set {
+                this.familyNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string SubstituteCharacter {
+            get {
+                return this.substituteCharacterField;
+            }
+            set {
+                this.substituteCharacterField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XM" +
+        "LImport.xsd")]
+    public partial class ProjectTemplate {
+        
+        private BaseElement[] itemsField;
+        
+        private string contextField;
+        
+        private string widthField;
+        
+        private string heightField;
+        
+        private string xsltField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Image", typeof(ImageElement))]
+        [System.Xml.Serialization.XmlElementAttribute("Rect", typeof(RectElement))]
+        [System.Xml.Serialization.XmlElementAttribute("Text", typeof(TextElement))]
+        public BaseElement[] Items {
+            get {
+                return this.itemsField;
+            }
+            set {
+                this.itemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Context {
+            get {
+                return this.contextField;
+            }
+            set {
+                this.contextField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Width {
+            get {
+                return this.widthField;
+            }
+            set {
+                this.widthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Height {
+            get {
+                return this.heightField;
+            }
+            set {
+                this.heightField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Xslt {
+            get {
+                return this.xsltField;
+            }
+            set {
+                this.xsltField = value;
             }
         }
     }
