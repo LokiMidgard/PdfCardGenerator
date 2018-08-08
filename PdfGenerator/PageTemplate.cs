@@ -479,12 +479,7 @@ namespace PdfGenerator
                             var w = wordSizes[i + wordsToPrint];
                             var nextW = (i + wordsToPrint + 1 < wordSizes.Length) ? new(string text, XSize size, XFont font, LastSplit lastSplit)?(wordSizes[i + wordsToPrint + 1]) : null;
 
-                            //check if font has changed and we need to make an additional draw call
-                            if (nextW != null && w.font != nextW?.font)
-                            {
-                                addSpace = false;
-                                break;
-                            }
+
 
                             // check if line is to short and we need a line break
                             if (w.size.Width + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
@@ -510,12 +505,19 @@ namespace PdfGenerator
                             lineWidth += w.size.Width;
                             if (w.lastSplit == LastSplit.Space && lineWidth != 0 /* the beginning of a line*/)
                                 lineWidth += spaceSize.Width;
+
+                            //check if font has changed and we need to make an additional draw call
+                            if (nextW != null && w.font != nextW?.font)
+                            {
+                                wordsToPrint++;
+                                addSpace = false;
+                                break;
+                            }
                         }
                         wordsToPrint = Math.Max(wordsToPrint, 1); // we want to print at least one word other wise we will not consume it and will print nothing agiain
 
 
                         var printFont = wordSizes.Skip(i).Take(wordsToPrint).First().font;
-                        var printWidth = wordSizes.Skip(i).Take(wordsToPrint).Sum(x => x.size.Width);
 
                         var textToPrint = wordSizes.Skip(i).Take(wordsToPrint).Aggregate("", (previousText, x2) =>
                          {
@@ -536,9 +538,10 @@ namespace PdfGenerator
                         if (addHyphon)
                             textToPrint += "-";
 
+                        var printSize = gfx.MeasureString(textToPrint, printFont);
                         var brush = new XSolidBrush(run.Color.Value.GetValue(context, resolver));
-                        currentLine.Add((textToPrint, printFont, brush, currentPosition, paragraph.Alignment.GetValue(context, resolver), gfx.MeasureString(textToPrint, printFont)));
-                        currentPosition = new XPoint(currentPosition.X + (addSpace ? spaceSize.Width : 0) + printWidth, currentPosition.Y);
+                        currentLine.Add((textToPrint, printFont, brush, currentPosition, paragraph.Alignment.GetValue(context, resolver), printSize));
+                        currentPosition = new XPoint(currentPosition.X + (addSpace ? spaceSize.Width : 0) + printSize.Width, currentPosition.Y);
 
                         if (endOfLine)
                         {
