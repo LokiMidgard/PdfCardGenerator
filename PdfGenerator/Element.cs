@@ -13,8 +13,8 @@ namespace PdfGenerator
     public abstract class Element
     {
         public ContextValue<XRect> Position { get; set; }
-
         public ContextValue<double> ZIndex { get; set; }
+
 
         public ContextValue<double> Rotation { get; set; }
 
@@ -37,6 +37,9 @@ namespace PdfGenerator
     public class TextElement : Element
     {
         public IList<IChild<Paragraph>> Paragraphs { get; set; }
+        public ContextValue<XLineAlignment> VerticalAlignment { get; set; }
+        public ContextValue<double> MinEmSizeScale { get; set; }
+        public ContextValue<double> MaxEmSizeScale { get; set; }
 
     }
 
@@ -46,7 +49,7 @@ namespace PdfGenerator
 
         private IList<IChild<Run>> _runs;
 
-        public IList<IChild<Run>> Runs { get => _runs ?? (_runs = new List<IChild<Run>>()); set => _runs = value; }
+        public IList<IChild<Run>> Runs { get => this._runs ?? (this._runs = new List<IChild<Run>>()); set => this._runs = value; }
         /// <summary>
         /// Linespace relativ to normal linespacing.
         /// </summary>
@@ -119,7 +122,7 @@ namespace PdfGenerator
         private ContextValue<XColor>? _color;
         private ContextValue<Language>? _language;
 
-        public ContextValue<Language>? Language { get => this._language ?? this.Paragraph.Language; internal set => _language = value; }
+        public ContextValue<Language>? Language { get => this._language ?? this.Paragraph.Language; internal set => this._language = value; }
         public ContextValue<XFontStyle>? FontStyle { get => this._fontStyle ?? this.Paragraph.FontStyle; set => this._fontStyle = value; }
         public ContextValue<double>? EmSize { get => this._emSize ?? this.Paragraph.EmSize; set => this._emSize = value; }
         public ContextValue<string>? FontName
@@ -176,7 +179,7 @@ namespace PdfGenerator
 
         public string GetValue(XElement context, IXmlNamespaceResolver resolver)
         {
-            var relativePath = Path.GetValue(context, resolver);
+            var relativePath = this.Path.GetValue(context, resolver);
             return System.IO.Path.Combine(this.WorkingDirectory.FullName, relativePath);
 
         }

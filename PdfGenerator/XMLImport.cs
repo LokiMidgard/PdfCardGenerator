@@ -1222,6 +1222,18 @@ namespace Serilizer {
         
         private AbstractParagraph[] itemsField;
         
+        private double minEmSizeScaleField;
+        
+        private double maxEmSizeScaleField;
+        
+        private Alignment verticalAlignmentField;
+        
+        public TextElement() {
+            this.minEmSizeScaleField = 1D;
+            this.maxEmSizeScaleField = 1D;
+            this.verticalAlignmentField = Alignment.Near;
+        }
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("ForEach", typeof(ForeEachParagraph))]
         [System.Xml.Serialization.XmlElementAttribute("Paragraph", typeof(Paragraph))]
@@ -1231,6 +1243,42 @@ namespace Serilizer {
             }
             set {
                 this.itemsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(1D)]
+        public double MinEmSizeScale {
+            get {
+                return this.minEmSizeScaleField;
+            }
+            set {
+                this.minEmSizeScaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(1D)]
+        public double MaxEmSizeScale {
+            get {
+                return this.maxEmSizeScaleField;
+            }
+            set {
+                this.maxEmSizeScaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(Alignment.Near)]
+        public Alignment VerticalAlignment {
+            get {
+                return this.verticalAlignmentField;
+            }
+            set {
+                this.verticalAlignmentField = value;
             }
         }
     }

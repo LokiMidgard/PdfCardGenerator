@@ -144,6 +144,9 @@
           <xs:element ref="mstns:Paragraph"/>
           <xs:element name="ForEach" type="mstns:ForeEachParagraph" />
         </xs:choice>
+        <xs:attribute name="MinEmSizeScale" type="xs:double" default="1"/>
+        <xs:attribute name="MaxEmSizeScale" type="xs:double" default="1"/>
+        <xs:attribute name="VerticalAlignment" type="mstns:Alignment" default="Near"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -434,7 +437,7 @@
             <xs:element ref="TextRun" />
             <xs:element ref="LineBreak" />
           </xs:choice>
-          <xs:attribute name="Select" type="xs:string"/>
+          <xs:attribute name="Select" type="xs:string" use="required"/>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

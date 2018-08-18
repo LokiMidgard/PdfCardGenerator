@@ -58,6 +58,9 @@ namespace PdfGenerator
                             {
                                 IsVisible = GetVisible(textElement),
                                 Position = GetPosition(textElement),
+                                MinEmSizeScale = textElement.MinEmSizeScale,
+                                MaxEmSizeScale = textElement.MaxEmSizeScale,
+                                VerticalAlignment = TransformAlignment(textElement.VerticalAlignment),
                                 Rotation = textElement.rotation,
                                 RotationOrigin = new XPoint(textElement.rotationOriginX, textElement.rotationOriginY),
                                 ZIndex = textElement.ZPosition,
