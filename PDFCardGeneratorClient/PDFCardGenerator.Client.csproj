@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PdfGenerator\PdfCardGenerator.csproj" />
+    <ProjectReference Include="..\PdfCardGenerator\PdfCardGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>
