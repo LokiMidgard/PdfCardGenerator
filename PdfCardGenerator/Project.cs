@@ -12,8 +12,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Xml.XPath;
-using Alignment = Serilizer.Alignment;
-using FontStyle = Serilizer.FontStyle;
+using Alignment = PdfCardGenerator.Serilizer.Alignment;
+using FontStyle = PdfCardGenerator.Serilizer.FontStyle;
 
 namespace PdfCardGenerator
 {

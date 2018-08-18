@@ -1,4 +1,4 @@
-﻿namespace Serilizer
+﻿namespace PdfCardGenerator.Serilizer
 {
     internal interface IHavePosition
     {

@@ -1,6 +1,6 @@
 ﻿using NHyphenator;
 using NHyphenator.Loaders;
-using Serilizer;
+using PdfCardGenerator.Serilizer;
 using System;
 using System.Collections.Generic;
 using System.IO;

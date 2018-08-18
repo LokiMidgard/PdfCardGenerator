@@ -1,6 +1,6 @@
 ﻿using PdfCardGenerator;
 using PdfSharp.Fonts;
-using Serilizer;
+using PdfCardGenerator.Serilizer;
 using System;
 using System.IO;
 

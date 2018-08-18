@@ -1,5 +1,5 @@
 ﻿using PdfSharp.Drawing;
-using Serilizer;
+using PdfCardGenerator.Serilizer;
 using System.Collections.Generic;
 
 namespace PdfCardGenerator.Elements

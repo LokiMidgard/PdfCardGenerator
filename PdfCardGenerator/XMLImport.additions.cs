@@ -1,20 +1,20 @@
 ﻿
-namespace Serilizer
+namespace PdfCardGenerator.Serilizer
 {
-    internal partial class Project
+    public partial class Project
     {
     }
 
-    internal partial class ProjectTemplate
+    public partial class ProjectTemplate
     {
     }
 
-    internal partial class ImageElement
+    public partial class ImageElement
     {
     }
 
     /// <remarks/>
-    internal abstract partial class BaseElement : IVisible, IHavePosition
+    public abstract partial class BaseElement : IVisible, IHavePosition
     {
         string IVisible.IsVisiblePath { get => this.IsVisiblePath; set => this.IsVisiblePath = value; }
         bool IVisible.IsVisible { get => this.IsVisible; set => this.IsVisible = value; }
@@ -24,27 +24,27 @@ namespace Serilizer
         string IHavePosition.width { get => this.width; set => this.width = value; }
     }
 
-    internal partial class TextElement
+    public partial class TextElement
     {
     }
 
-    internal partial class AbstractParagraph : IVisible
-    {
-        string IVisible.IsVisiblePath { get => this.IsVisiblePath; set => this.IsVisiblePath = value; }
-        bool IVisible.IsVisible { get => this.IsVisible; set => this.IsVisible = value; }
-    }
-
-    internal partial class Run : IVisible
+    public partial class AbstractParagraph : IVisible
     {
         string IVisible.IsVisiblePath { get => this.IsVisiblePath; set => this.IsVisiblePath = value; }
         bool IVisible.IsVisible { get => this.IsVisible; set => this.IsVisible = value; }
     }
 
-    internal partial class TextElementParagraphLineBreak
+    public partial class Run : IVisible
+    {
+        string IVisible.IsVisiblePath { get => this.IsVisiblePath; set => this.IsVisiblePath = value; }
+        bool IVisible.IsVisible { get => this.IsVisible; set => this.IsVisible = value; }
+    }
+
+    public partial class TextElementParagraphLineBreak
     {
     }
 
-    internal partial class TextElementParagraphRun
+    public partial class TextElementParagraphRun
     {
 
     }
