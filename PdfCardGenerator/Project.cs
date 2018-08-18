@@ -27,6 +27,7 @@ namespace PdfCardGenerator
         internal Serilizer.Language DefaultLanguage { get; set; }
         internal string[] FallbackFonts { get; set; }
         internal Serilizer.ProjectFallbackFontsNotFoundCharacter CharacterNotFound { get; set; }
+        public DirectoryInfo WorkingDirectroy { get; private set; }
 
         public static Project Load(string path)
         {
@@ -171,28 +172,34 @@ namespace PdfCardGenerator
 
             foreach (var f in deserilisation.Fonts.Font)
             {
-                using (var fontStream = File.OpenRead(f.Regular.Path))
+                string ConvertPath(string path)
+                {
+                    if (!Path.IsPathRooted(path))
+                        return Path.Combine(workingDirectory.FullName, path);
+                    return path;
+                }
+                using (var fontStream = File.OpenRead(ConvertPath(f.Regular.Path)))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
                         boldStyle: PdfCardGenerator.FontResolver.BoldStyle.None,
                         italicStyle: PdfCardGenerator.FontResolver.ItalicStyle.None,
                         stream: fontStream);
 
-                using (var fontStream = File.OpenRead(f.Italic?.Path ?? f.Regular.Path))
+                using (var fontStream = File.OpenRead(ConvertPath(f.Italic?.Path ?? f.Regular.Path)))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
                         boldStyle: PdfCardGenerator.FontResolver.BoldStyle.None,
                         italicStyle: f.Italic != null ? PdfCardGenerator.FontResolver.ItalicStyle.Applyed : PdfCardGenerator.FontResolver.ItalicStyle.Simulate,
                         stream: fontStream);
 
-                using (var fontStream = File.OpenRead(f.Bold?.Path ?? f.Regular.Path))
+                using (var fontStream = File.OpenRead(ConvertPath(f.Bold?.Path ?? f.Regular.Path)))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
                         boldStyle: f.Bold != null ? PdfCardGenerator.FontResolver.BoldStyle.Applyed : PdfCardGenerator.FontResolver.BoldStyle.Simulate,
                         italicStyle: PdfCardGenerator.FontResolver.ItalicStyle.None,
                         stream: fontStream);
 
-                using (var fontStream = File.OpenRead(f.BoldItalic?.Path ?? f.Regular.Path))
+                using (var fontStream = File.OpenRead(ConvertPath(f.BoldItalic?.Path ?? f.Regular.Path)))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
                         boldStyle: f.Bold != null ? PdfCardGenerator.FontResolver.BoldStyle.Applyed : PdfCardGenerator.FontResolver.BoldStyle.Simulate,
@@ -208,6 +215,7 @@ namespace PdfCardGenerator
                 DefaultLanguage = deserilisation.DefaultLanguage,
                 FontResolver = fontResolver,
                 Templates = templates,
+                WorkingDirectroy = workingDirectory,
                 Document = doc
             };
             foreach (var tempalte in project.Templates)
