@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.0.1</Version>
     <Authors>Patrick Kranz</Authors>
@@ -13,6 +14,7 @@
     <RepositoryUrl>https://github.com/LokiMidgard/PdfCardGenerator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>PDF, PDF generator, playing cards</PackageTags>
+    
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigraDoc\PDFsharp\src\PdfSharp\PdfSharp.csproj" />
+    <ProjectReference Include="..\MigraDoc\PDFsharp\src\PdfSharp\PdfSharp.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,5 +43,11 @@
       <DependentUpon>XMLImport.xsd</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))" />
+    </ItemGroup>
+  </Target>
 
 </Project>
