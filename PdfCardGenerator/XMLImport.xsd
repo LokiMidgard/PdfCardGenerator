@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="XMLImport"
-  targetNamespace="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
+  targetNamespace="https://raw.githubusercontent.com/LokiMidgard/PdfCardGenerator/master/PdfCardGenerator/XMLImport.xsd"
   elementFormDefault="qualified"
-  xmlns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
-  xmlns:mstns="https://raw.githubusercontent.com/LokiMidgard/PdfGenerator/master/PdfGenerator/XMLImport.xsd"
+  xmlns="https://raw.githubusercontent.com/LokiMidgard/PdfCardGenerator/master/PdfCardGenerator/XMLImport.xsd"
+  xmlns:mstns="https://raw.githubusercontent.com/LokiMidgard/PdfCardGenerator/master/PdfCardGenerator/XMLImport.xsd"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   >
