@@ -7,7 +7,8 @@ foreach ($v in $versions) {
 
     if(Test-Path $path) {
 		cmd /c """$path""&xsd XMLImport.xsd /classes /namespace:Serilizer"
-		
+		$output = 'XMLImport.cs'
+		(Get-Content $output).replace('public', 'internal') | Set-Content $output
 		break
 	}
 }

@@ -1,11 +1,9 @@
 ﻿using Fclp;
-using PdfSharp.Drawing;
-using PdfSharp.Fonts;
 using System;
 using System.IO;
 using System.Xml.Linq;
 
-namespace PDFGenerator.Client
+namespace PDFCardGenerator.Client
 {
     class Program
     {
@@ -59,7 +57,7 @@ namespace PDFGenerator.Client
 
                 using (var xmlStream = System.IO.File.OpenRead(options.DataPath))
                 {
-                    var project = PdfGenerator.Project.Load(options.ProjectPath);
+                    var project = PdfCardGenerator.Project.Load(options.ProjectPath);
 
                     var xml = XDocument.Load(xmlStream);
 

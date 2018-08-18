@@ -1,6 +1,6 @@
 ﻿namespace Serilizer
 {
-    public interface IHavePosition
+    internal interface IHavePosition
     {
         string height { get; set; }
         string left { get; set; }

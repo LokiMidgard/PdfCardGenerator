@@ -9,7 +9,7 @@ using System.Text;
 
 namespace PdfCardGenerator
 {
-    class HyphenatePatternsLoader : IHyphenatePatternsLoader
+    internal class HyphenatePatternsLoader : IHyphenatePatternsLoader
     {
         private readonly ResourceHyphenatePatternsLoader originalPatternLoader;
         private readonly string exceptions;
@@ -96,12 +96,12 @@ namespace PdfCardGenerator
 
             public int GetLevelByIndex(int index)
             {
-                return levels[index];
+                return this.levels[index];
             }
 
             public int GetLevelsCount()
             {
-                return levels.Length;
+                return this.levels.Length;
             }
 
             public Pattern(string str, IEnumerable<int> levels)
@@ -114,7 +114,7 @@ namespace PdfCardGenerator
             public Pattern(string str)
             {
                 this.str = str;
-                levels = new int[0];
+                this.levels = new int[0];
             }
 
             public static int Compare(Pattern x, Pattern y)

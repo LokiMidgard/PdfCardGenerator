@@ -1,5 +1,6 @@
 ﻿using NHyphenator;
 using PdfCardGenerator;
+using PdfCardGenerator.Elements;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System;
@@ -14,9 +15,9 @@ using System.Xml.Xsl;
 
 
 
-namespace PdfGenerator
+namespace PdfCardGenerator
 {
-    public class PageTemplate
+    internal class PageTemplate
     {
         public Project Project { get; set; }
 
@@ -637,7 +638,7 @@ namespace PdfGenerator
 
 
                         var printFont = wordSizes.Skip(i).Take(wordsToPrint).First().font;
- 
+
                         var textToPrint = wordSizes.Skip(i).Take(wordsToPrint).Aggregate("", (previousText, x2) =>
                          {
                              switch (x2.lastSplit)

@@ -6,11 +6,11 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace PdfGenerator
+namespace PdfCardGenerator
 {
 
     [System.Diagnostics.DebuggerDisplay("Value: {value} / XPath:{xpath}")]
-    public struct ContextValue<T> : IContextValue<T>
+    internal struct ContextValue<T> : IContextValue<T>
     {
         private static ContextValue<T> Empty { get; } = new ContextValue<T>();
 
@@ -117,7 +117,7 @@ namespace PdfGenerator
         public static implicit operator ContextValue<T>(XPath value) => FromXPath(value.Path);
     }
 
-    public struct XPath
+    internal struct XPath
     {
         public readonly string Path;
         public XPath(string path)

@@ -1,30 +1,32 @@
-﻿using System;
+﻿using PdfCardGenerator.Elements;
+using PdfSharp.Drawing;
+using PdfSharp.Fonts;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using System.Xml.Serialization;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
-using Serilizer;
 using System.Xml;
-using PdfSharp.Pdf.IO;
-using System.IO;
-using PdfSharp.Fonts;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using System.Xml.XPath;
+using Alignment = Serilizer.Alignment;
+using FontStyle = Serilizer.FontStyle;
 
-namespace PdfGenerator
+namespace PdfCardGenerator
 {
     public class Project
     {
 
-        public IEnumerable<PageTemplate> Templates { get; set; }
+        internal IEnumerable<PageTemplate> Templates { get; set; }
         public XDocument Document { get; private set; }
 
-        public IFontResolver FontResolver { get; set; }
-        public Language DefaultLanguage { get; set; }
-        public string[] FallbackFonts { get; private set; }
-        public ProjectFallbackFontsNotFoundCharacter CharacterNotFound { get; private set; }
+        internal IFontResolver FontResolver { get; set; }
+        internal Serilizer.Language DefaultLanguage { get; set; }
+        internal string[] FallbackFonts { get; set; }
+        internal Serilizer.ProjectFallbackFontsNotFoundCharacter CharacterNotFound { get; set; }
 
         public static Project Load(string path)
         {
@@ -66,7 +68,7 @@ namespace PdfGenerator
                                 ZIndex = textElement.ZPosition,
                                 Paragraphs = textElement.Items.Select(child =>
                                 {
-                                    if (child is ForeEachParagraph foreEach)
+                                    if (child is Serilizer.ForeEachParagraph foreEach)
                                         return GetParagraps(foreEach);
                                     else if (child is Serilizer.Paragraph p)
                                         return GetParagrap(p);
@@ -172,29 +174,29 @@ namespace PdfGenerator
                 using (var fontStream = File.OpenRead(f.Regular.Path))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
-                        boldStyle: PdfGenerator.FontResolver.BoldStyle.None,
-                        italicStyle: PdfGenerator.FontResolver.ItalicStyle.None,
+                        boldStyle: PdfCardGenerator.FontResolver.BoldStyle.None,
+                        italicStyle: PdfCardGenerator.FontResolver.ItalicStyle.None,
                         stream: fontStream);
 
                 using (var fontStream = File.OpenRead(f.Italic?.Path ?? f.Regular.Path))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
-                        boldStyle: PdfGenerator.FontResolver.BoldStyle.None,
-                        italicStyle: f.Italic != null ? PdfGenerator.FontResolver.ItalicStyle.Applyed : PdfGenerator.FontResolver.ItalicStyle.Simulate,
+                        boldStyle: PdfCardGenerator.FontResolver.BoldStyle.None,
+                        italicStyle: f.Italic != null ? PdfCardGenerator.FontResolver.ItalicStyle.Applyed : PdfCardGenerator.FontResolver.ItalicStyle.Simulate,
                         stream: fontStream);
 
                 using (var fontStream = File.OpenRead(f.Bold?.Path ?? f.Regular.Path))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
-                        boldStyle: f.Bold != null ? PdfGenerator.FontResolver.BoldStyle.Applyed : PdfGenerator.FontResolver.BoldStyle.Simulate,
-                        italicStyle: PdfGenerator.FontResolver.ItalicStyle.None,
+                        boldStyle: f.Bold != null ? PdfCardGenerator.FontResolver.BoldStyle.Applyed : PdfCardGenerator.FontResolver.BoldStyle.Simulate,
+                        italicStyle: PdfCardGenerator.FontResolver.ItalicStyle.None,
                         stream: fontStream);
 
                 using (var fontStream = File.OpenRead(f.BoldItalic?.Path ?? f.Regular.Path))
                     fontResolver.AddFont(
                         familyName: f.FamilyName,
-                        boldStyle: f.Bold != null ? PdfGenerator.FontResolver.BoldStyle.Applyed : PdfGenerator.FontResolver.BoldStyle.Simulate,
-                        italicStyle: f.Italic != null ? PdfGenerator.FontResolver.ItalicStyle.Applyed : PdfGenerator.FontResolver.ItalicStyle.Simulate,
+                        boldStyle: f.Bold != null ? PdfCardGenerator.FontResolver.BoldStyle.Applyed : PdfCardGenerator.FontResolver.BoldStyle.Simulate,
+                        italicStyle: f.Italic != null ? PdfCardGenerator.FontResolver.ItalicStyle.Applyed : PdfCardGenerator.FontResolver.ItalicStyle.Simulate,
                         stream: fontStream);
 
             }
@@ -237,8 +239,8 @@ namespace PdfGenerator
             {
                 var result = new Paragraph
                 {
-                    AfterParagraph = (XUnit)(p.AfterParagraph ?? XUnit.Zero),
-                    BeforeParagraph = (XUnit)(p.BeforeParagraph ?? XUnit.Zero),
+                    AfterParagraph = p.AfterParagraph ?? XUnit.Zero,
+                    BeforeParagraph = p.BeforeParagraph ?? XUnit.Zero,
                     Alignment = TransformAlignment(p.Alignment),
                     EmSize = p.EmSize,
                     IsVisible = GetVisible(p),
@@ -251,7 +253,7 @@ namespace PdfGenerator
 
                 IChild<Run> GetRun(Serilizer.Run run)
                 {
-                    if (run is LineBreak lineBreak)
+                    if (run is Serilizer.LineBreak lineBreak)
                     {
                         return new LineBreakRun(result)
                         {
@@ -268,11 +270,11 @@ namespace PdfGenerator
                         {
                             FontStyle = textRun.FontStyleSpecified ? (ContextValue<XFontStyle>?)ContextValue<XFontStyle>.FromValue(TransformFontStyle(textRun.FontStyle)) : null,
                             EmSize = textRun.EmSizeSpecified ? (ContextValue<double>?)ContextValue<double>.FromValue(textRun.EmSize) : null,
-                            Language = textRun.LanguageSpecified ? (ContextValue<Language>?)ContextValue<Language>.FromValue(textRun.Language) : null,
+                            Language = textRun.LanguageSpecified ? (ContextValue<Serilizer.Language>?)ContextValue<Serilizer.Language>.FromValue(textRun.Language) : null,
                             FontName = textRun.FontName,
                             Color = textRun.Color == null ? (XColor?)null : GetColorFromString(textRun.Color),
                             IsVisible = GetVisible(textRun),
-                            Text = textRun.ItemElementName == ItemChoiceType.Text ? textRun.Item : ContextValue<string>.FromXPath(textRun.Item)
+                            Text = textRun.ItemElementName == Serilizer.ItemChoiceType.Text ? textRun.Item : ContextValue<string>.FromXPath(textRun.Item)
                         };
                     }
                     else if (run is Serilizer.ForEachRun forEach)

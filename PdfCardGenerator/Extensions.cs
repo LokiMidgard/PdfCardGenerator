@@ -7,9 +7,9 @@ using System.Xml.Linq;
 
 namespace PdfCardGenerator
 {
-    public static class Extensions
+    internal static class Extensions
     {
-        public static IDisposable RotateTransform(this XGraphics gfx, PdfGenerator.Element element, XElement context, IXmlNamespaceResolver resolver)
+        public static IDisposable RotateTransform(this XGraphics gfx, Elements.Element element, XElement context, IXmlNamespaceResolver resolver)
         {
             //rotation = Math.PI * 2 * rotation / 360.0;
             var state = gfx.SaveState();
@@ -46,12 +46,12 @@ namespace PdfCardGenerator
 
             protected virtual void Dispose(bool disposing)
             {
-                if (!disposedValue)
+                if (!this.disposedValue)
                 {
                     if (disposing)
-                        onDispose();
+                        this.onDispose();
 
-                    disposedValue = true;
+                    this.disposedValue = true;
                 }
             }
 
@@ -60,7 +60,7 @@ namespace PdfCardGenerator
             public void Dispose()
             {
                 // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-                Dispose(true);
+                this.Dispose(true);
             }
             #endregion
 

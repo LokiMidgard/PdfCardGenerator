@@ -1,12 +1,12 @@
-﻿using System;
-using System.IO;
-using PdfCardGenerator;
+﻿using PdfCardGenerator;
 using PdfSharp.Fonts;
 using Serilizer;
+using System;
+using System.IO;
 
-namespace PdfGenerator
+namespace PdfCardGenerator
 {
-    public class FontResolver : IFontResolver
+    internal class FontResolver : IFontResolver
     {
 
         private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (FontResolverInfo resolver, byte[] data)> fontFaceLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, (FontResolverInfo facename, byte[] data)>();
@@ -34,7 +34,7 @@ namespace PdfGenerator
             {
                 stream.CopyTo(memoryStream);
                 var data = memoryStream.ToArray();
-                if (!fontFaceLookup.TryAdd(faceName, (resolver, data)))
+                if (!this.fontFaceLookup.TryAdd(faceName, (resolver, data)))
                     throw new ArgumentException($"FontFace <{faceName}> already used");
             }
         }
@@ -53,7 +53,7 @@ namespace PdfGenerator
                 (isItalic ? "|i" : "");
             if (this.fontFaceLookup.TryGetValue(faceName, out var item))
                 return item.resolver;
-            if (systemFontsFallback)
+            if (this.systemFontsFallback)
                 return PlatformFontResolver.ResolveTypeface(familyName, isBold, isItalic);
             return null;
         }

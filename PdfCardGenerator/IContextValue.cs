@@ -1,9 +1,9 @@
 ﻿using System.Xml;
 using System.Xml.Linq;
 
-namespace PdfGenerator
+namespace PdfCardGenerator
 {
-    public interface IContextValue<T>
+    internal interface IContextValue<T>
     {
         T GetValue(XElement context, IXmlNamespaceResolver resolver);
     }

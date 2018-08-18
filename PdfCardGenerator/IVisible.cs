@@ -1,6 +1,6 @@
 ﻿namespace Serilizer
 {
-    public interface IVisible
+    internal interface IVisible
     {
         string IsVisiblePath { get; set; }
         //bool IsVisibleSpecified { get; set; }
