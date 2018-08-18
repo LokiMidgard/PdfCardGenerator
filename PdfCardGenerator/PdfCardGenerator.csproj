@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.2</Version>
+    <Version>0.0.4</Version>
     <Authors>Patrick Kranz</Authors>
     <Company />
     <Description>A generator that takes data in form of xml documents and a template to generate a PDF with playing cards.</Description>
@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/LokiMidgard/PdfCardGenerator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>PDF, PDF generator, playing cards</PackageTags>
-    
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,9 +30,15 @@
   <ItemGroup>
     <PackageReference Include="NHyphenator" Version="1.2.1" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.0'" >
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="PresentationCore" />
+  </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigraDoc\PDFsharp\src\PdfSharp\PdfSharp.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\MigraDoc\PDFsharp\src\PdfSharp\PdfSharp.csproj" PrivateAssets="all"  />
   </ItemGroup>
 
   <ItemGroup>
