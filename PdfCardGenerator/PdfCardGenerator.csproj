@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Patrick Kranz</Authors>
+    <Company />
+    <Description>A generator that takes data in form of xml documents and a template to generate a PDF with playing cards.</Description>
+    <PackageLicenseUrl>https://github.com/LokiMidgard/PdfCardGenerator/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/LokiMidgard/PdfCardGenerator</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/LokiMidgard/PdfCardGenerator.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>PDF, PDF generator, playing cards</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
