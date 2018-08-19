@@ -41,7 +41,9 @@ namespace PdfCardGenerator
                 elements = elements.Select(e =>
                 {
                     var transformer = new XslCompiledTransform();
-                    transformer.Load(this.XSLT.Value.GetValue(e, resolver));
+                    using (var reader = XmlReader.Create(this.XSLT.Value.GetValue(e, resolver)))
+                        transformer.Load(reader);
+
                     //transformer.XmlResolver = resolver;
                     var builder = new StringBuilder();
                     using (var writer = XmlWriter.Create(builder))
@@ -83,11 +85,11 @@ namespace PdfCardGenerator
                             }
                             else if (item is ImageElement imageElement)
                             {
-                                var path = imageElement.ImagePath.GetValue(context, resolver);
                                 var position = imageElement.Position.GetValue(context, resolver);
 
 
-                                using (var image = XImage.FromFile(path))
+                                using (var stream = imageElement.ImagePath.GetValue(context, resolver))
+                                using (var image = XImage.FromStream(stream))
                                     gfx.DrawImage(image, position);
                             }
                             else if (item is RectElement rectElement)
