@@ -604,12 +604,12 @@ namespace PdfCardGenerator
 
 
                             // check if line is to short and we need a line break
-                            if (w.size.Width + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                            if (w.size.Width + (addSpace?spaceSize.Width:0) + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
                             {
                                 var currentW = w;
                                 var previousW = (i + wordsToPrint - 1 > 0) ? new (string text, XSize size, XFont font, LastSplit lastSplit)?(wordSizes[i + wordsToPrint - 1]) : null;
                                 // we are over the bounding. set current Position to next line
-                                while (currentW.lastSplit == LastSplit.Hyphon && currentPosition.X + lineWidth + hyphonSize.Width > frame.Right && previousW != null) // the hyphon alos is to long, so one part lesss
+                                while (currentW.lastSplit == LastSplit.Hyphon && currentPosition.X + lineWidth + (addSpace ? spaceSize.Width : 0) + hyphonSize.Width > frame.Right && previousW != null) // the hyphon alos is to long, so one part lesss
                                 {
                                     wordsToPrint--;
                                     lineWidth -= previousW.Value.size.Width;
