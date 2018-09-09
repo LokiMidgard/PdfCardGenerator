@@ -59,12 +59,19 @@
             <xs:sequence>
               <xs:element name="Template" maxOccurs="unbounded">
                 <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="MediaBox" type="rect" minOccurs="0"/>
+                    <xs:element name="CropBox" type="rect" minOccurs="0"/>
+                    <xs:element name="BleedBox" type="rect" minOccurs="0"/>
+                    <xs:element name="TrimBox" type="rect" minOccurs="0"/>
+                    <xs:element name="ArtBox" type="rect" minOccurs="0"/>
                   <xs:choice maxOccurs="unbounded">
                     <xs:element name="Image" type="mstns:ImageElement" />
                     <xs:element name="Text" type="mstns:TextElement" />
                     <xs:element name="Rect" type="mstns:RectElement" />
 
                   </xs:choice>
+                  </xs:sequence>
                   <xs:attribute name="Context" type="xs:string" use="required"/>
                   <xs:attribute name="Width" type="mstns:Unit" use="required"/>
                   <xs:attribute name="Height" type="mstns:Unit" use="required"/>
@@ -112,6 +119,13 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name="rect">
+    <xs:attribute name="top" type="Unit" use="required"/>
+    <xs:attribute name="left" type="Unit" use="required"/>
+    <xs:attribute name="width" type="Unit" use="required"/>
+    <xs:attribute name="height" type="Unit" use="required"/>
+  </xs:complexType>
+  
   <xs:simpleType name="Unit">
     <xs:restriction base="xs:string">
       <xs:pattern value="[0-9]+(\.[0-9]+)? ?(pt|mm|cm|in|pu)"/>

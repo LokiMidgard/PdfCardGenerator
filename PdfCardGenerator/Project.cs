@@ -47,12 +47,17 @@ namespace PdfCardGenerator
 
             var templates = deserilisation.Templates.Select(original =>
             {
-                return new PageTemplate
+                var template = new PageTemplate
                 {
                     XSLT = original.Xslt != null ? (RelativePath?)(new RelativePath() { Path = original.Xslt, WorkingDirectory = fileProvider }) : null,
                     ContextPath = (XPath)original.Context,
                     Height = original.Height,
                     Width = original.Width,
+                    MediatBox = RectToXRect(original.MediaBox),
+                    CroptBox = RectToXRect(original.CropBox),
+                    BleedtBox = RectToXRect(original.BleedBox),
+                    TrimtBox = RectToXRect(original.TrimBox),
+                    ArtBox = RectToXRect(original.ArtBox),
                     Elements = original.Items.Select<object, Element>(x =>
                     {
                         if (x is Serilizer.TextElement textElement)
@@ -167,6 +172,8 @@ namespace PdfCardGenerator
                     }).ToArray()
                 };
 
+                    
+                return template;
             }).ToArray();
             var fontResolver = new FontResolver(deserilisation.Fonts.UseSystemFallback);
 
@@ -297,6 +304,15 @@ namespace PdfCardGenerator
             }
 
         }
+
+        private static XRect? RectToXRect(Serilizer.rect box)
+        {
+            if (box == null)
+                return null;
+
+            return new XRect((XUnit)box.left, (XUnit)box.top, (XUnit)box.width, (XUnit)box.height);
+        }
+
 
         private static XColor GetColorFromString(string colorString)
         {

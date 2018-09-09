@@ -24,6 +24,16 @@ namespace PdfCardGenerator
         public XUnit Width { get; set; }
         public XUnit Height { get; set; }
 
+        public XRect? MediatBox { get; set; }
+
+        public XRect? CroptBox { get; set; }
+
+        public XRect? BleedtBox { get; set; }
+
+        public XRect? TrimtBox { get; set; }
+
+        public XRect? ArtBox { get; set; }
+
         public XPath ContextPath { get; set; }
 
         public IList<Element> Elements { get; set; } = new List<Element>();
@@ -64,6 +74,17 @@ namespace PdfCardGenerator
                 var page = document.AddPage();
                 page.Width = this.Width;
                 page.Height = this.Height;
+
+                if (this.MediatBox.HasValue)
+                    page.MediaBox = new PdfRectangle(this.MediatBox.Value);
+                if (this.CroptBox.HasValue)
+                    page.CropBox = new PdfRectangle(this.CroptBox.Value);
+                if (this.BleedtBox.HasValue)
+                    page.BleedBox = new PdfRectangle(this.BleedtBox.Value);
+                if (this.TrimtBox.HasValue)
+                    page.TrimBox = new PdfRectangle(this.TrimtBox.Value);
+                if (this.ArtBox.HasValue)
+                    page.ArtBox = new PdfRectangle(this.ArtBox.Value);
 
                 // Get an XGraphics object for drawing
                 using (var gfx = XGraphics.FromPdfPage(page))
@@ -604,7 +625,7 @@ namespace PdfCardGenerator
 
 
                             // check if line is to short and we need a line break
-                            if (w.size.Width + (addSpace?spaceSize.Width:0) + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
+                            if (w.size.Width + (addSpace ? spaceSize.Width : 0) + currentPosition.X + lineWidth > frame.Right && i + wordsToPrint != 0 /*we can't make a linebreka before the first word*/)
                             {
                                 var currentW = w;
                                 var previousW = (i + wordsToPrint - 1 > 0) ? new (string text, XSize size, XFont font, LastSplit lastSplit)?(wordSizes[i + wordsToPrint - 1]) : null;

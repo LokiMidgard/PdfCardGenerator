@@ -1288,6 +1288,68 @@ namespace PdfCardGenerator.Serilizer {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfCardGenerator/master/PdfCardGene" +
+        "rator/XMLImport.xsd")]
+    public partial class rect {
+        
+        private string topField;
+        
+        private string leftField;
+        
+        private string widthField;
+        
+        private string heightField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string top {
+            get {
+                return this.topField;
+            }
+            set {
+                this.topField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string left {
+            get {
+                return this.leftField;
+            }
+            set {
+                this.leftField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string width {
+            get {
+                return this.widthField;
+            }
+            set {
+                this.widthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string height {
+            get {
+                return this.heightField;
+            }
+            set {
+                this.heightField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="https://raw.githubusercontent.com/LokiMidgard/PdfCardGenerator/master/PdfCardGene" +
         "rator/XMLImport.xsd")]
     public partial class ProjectFallbackFonts {
@@ -1386,6 +1448,16 @@ namespace PdfCardGenerator.Serilizer {
         "rator/XMLImport.xsd")]
     public partial class ProjectTemplate {
         
+        private rect mediaBoxField;
+        
+        private rect cropBoxField;
+        
+        private rect bleedBoxField;
+        
+        private rect trimBoxField;
+        
+        private rect artBoxField;
+        
         private BaseElement[] itemsField;
         
         private string contextField;
@@ -1395,6 +1467,56 @@ namespace PdfCardGenerator.Serilizer {
         private string heightField;
         
         private string xsltField;
+        
+        /// <remarks/>
+        public rect MediaBox {
+            get {
+                return this.mediaBoxField;
+            }
+            set {
+                this.mediaBoxField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public rect CropBox {
+            get {
+                return this.cropBoxField;
+            }
+            set {
+                this.cropBoxField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public rect BleedBox {
+            get {
+                return this.bleedBoxField;
+            }
+            set {
+                this.bleedBoxField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public rect TrimBox {
+            get {
+                return this.trimBoxField;
+            }
+            set {
+                this.trimBoxField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public rect ArtBox {
+            get {
+                return this.artBoxField;
+            }
+            set {
+                this.artBoxField = value;
+            }
+        }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Image", typeof(ImageElement))]
