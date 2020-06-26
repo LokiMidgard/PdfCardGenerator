@@ -15,7 +15,15 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>PDF, PDF generator, playing cards</PackageTags>
 
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <None Remove="Resources\deDE.hyp.txt" />
